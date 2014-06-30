@@ -1,66 +1,10 @@
 # node-ytdl [![Build Status](https://secure.travis-ci.org/fent/node-ytdl.png)](http://travis-ci.org/fent/node-ytdl)
 
-Yet another youtube downloading module. This time written with only Javascript and a more node-friendly streaming interface.
-
+A youtube downloader written in Javascript. To be used with the command line. If you're looking to use it in your node program, check out [ytdl-core](https://github.com/fent/node-ytdl-core).
 
 # Usage
 
-```js
-var fs = require('fs');
-var ytdl = require('ytdl');
-
-ytdl('http://www.youtube.com/watch?v=A02s8omM_hI')
-  .pipe(fs.createWriteStream('video.flv'));
-```
-
-
-# API
-### ytdl(url, options)
-
-Attempts to download a video from the given url. Returns a readable stream. `options` can have the following keys
-
-* `quality` - Video quality to download. Can be an [itag value](http://en.wikipedia.org/wiki/YouTube#Quality_and_codecs) value, `highest`, or `lowest`. Defaults to `highest`.
-* `filter` - You can give a filtering function that gets called with each format available. Used to decide what format to download. This function is given the `format` object as its first argument, and should return true if the format is preferable.
-* `range` - A byte range in the form `INT-INT` that specifies a part of the video to download. ie 10355705-12452856.
-
-```js
-// Example with `filter` option.
-ytdl(url, { filter: function(format) { return format.container === 'mp4'; } })
-  .pipe(fs.createWriteStream('vide.mp4'));
-```
-
-`options` can also have any [request](https://github.com/mikeal/request) options.
-
-The returned readable stream emits these additional events.
-
-### Event: 'info'
-* `Object` - Info.
-* `Object` - Format.
-
-Emitted when the a video's `info` hash is fetched. Along with the chosen format metadata to download. `format.url` might be different if `start` was given. `format.size` will also be available.
-
-Info and format may look like [this](https://gist.github.com/fent/6c8251132e1addb5121e).
-
-### ytdl.getInfo(url, [options], callback(err, info))
-
-Use this if you only want to get metainfo from a video.
-
-`options` gets passed to the `request()`, it can also have a `downloadURL` property set to `true` if you want ytdl to include the download url instead of the regular one. In some cases, a signature needs to be deciphered, and will require ytdl to make additional requests.
-
-### ytdl.cache
-
-A [memory cache](https://github.com/hij1nx/EventVat) is used to store information about recently retrieved videos. This is used to prevent double requests on videos that you want to retrieve the info of, and then download.
-
-
-# Install
-
-    npm install ytdl
-
-# CLI
-
-ytdl can be used from the command line too. Install with the `-g` flag to use it.
-
-    ytdl http://www.youtube.com/watch?v=_HSylqgVYQI > cat.flv
+    ytdl http://www.youtube.com/watch?v=_HSylqgVYQI > myvideo.flv
 
 And it streams!
 
@@ -80,6 +24,10 @@ And it streams!
        --filter-encoding REGEXP       Filter in format encoding.
        --unfilter-encoding REGEXP     Filter out format encoding.
        -i, --info                     Print video info without downloading
+
+# Install
+
+    [sudo] npm -g install ytdl
 
 
 # Tests
