@@ -2,8 +2,9 @@
 
 var path  = require('path');
 var fs    = require('fs');
-var ytdl  = require('..');
+var ytdl  = require('ytdl-core');
 var cliff = require('cliff');
+var util  = require('../lib/util');
 require('colors');
 
 
@@ -81,31 +82,6 @@ var opts = require('nomnom')
 
 
 /**
- * Converts seconds into human readable time hh:mm:ss
- *
- * @param {Number} seconds
- * @return {String}
- */
-function toHumanTime(seconds) {
-  var h = Math.floor(seconds / 3600);
-  var m = Math.floor(seconds / 60) % 60;
-
-  var time;
-  if (h > 0) {
-    time = h + ':';
-    if (m < 10) { m = '0' + m; }
-  } else {
-    time = '';
-  }
-
-  var s = seconds % 60;
-  if (s < 10) { s = '0' + s; }
-
-  return time + m + ':' + s;
-}
-
-
-/**
  * Prints basic video information.
  *
  * @param {Object} info
@@ -118,7 +94,7 @@ function printVideoInfo(info) {
     info.avg_rating.toFixed(1) : info.avg_rating;
   console.log('average rating: '.grey.bold + rating);
   console.log('view count: '.grey.bold + info.view_count);
-  console.log('length: '.grey.bold + toHumanTime(info.length_seconds));
+  console.log('length: '.grey.bold + util.toHumanTime(info.length_seconds));
 }
 
 
@@ -219,16 +195,6 @@ readStream.on('error', function(err) {
   process.exit(1);
 });
 
-// Converst bytes to human readable unit.
-// Thank you Amir from StackOverflow.
-var units = ' KMGTPEZYXWVU';
-function toHumanSize(bytes) {
-  if (bytes <= 0) { return 0; }
-  var t2 = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), 12);
-  return (Math.round(bytes * 100 / Math.pow(1024, t2)) / 100) +
-          units.charAt(t2).replace(' ', '') + 'B';
-}
-
 // Print progress bar and some video info if not streaming to stdout.
 if (output) {
   readStream.on('info', function(info, format) {
@@ -236,7 +202,7 @@ if (output) {
     console.log('container: '.grey.bold + format.container);
     console.log('resolution: '.grey.bold + format.resolution);
     console.log('encoding: '.grey.bold + format.encoding);
-    console.log('size: '.grey.bold + toHumanSize(format.size));
+    console.log('size: '.grey.bold + util.toHumanSize(format.size));
     console.log('output: '.grey.bold + output);
     console.log();
 

@@ -1,7 +1,7 @@
 {
   "name": "ytdl",
-  "description": "A pure Javascript streaming youtube video downloader.",
-  "keywords": ["youtube", "download", "video"],
+  "description": "A command line streaming youtube video downloader.",
+  "keywords": ["youtube", "download", "video", "cli"],
   "version": "0.2.8",
   "repository": {
     "type": "git",
@@ -9,9 +9,10 @@
   },
   "author": "Roly Fentanes (https://github.com/fent)",
   "main": "./lib/index.js",
+  "preferGlobal": true,
   "bin": { "ytdl": "./bin/ytdl.js" },
   "scripts": {
-    "test": "mocha -R spec -t 10000 test/*-test.js"
+    "test": "mocha -R spec test/*-test.js"
   },
   "directories": {
     "lib": "./lib"
@@ -19,18 +20,11 @@
   "dependencies": {
     "cliff": "~0.1.8",
     "colors": "~0.6.0-1",
-    "eventvat": "~0.2.1",
-    "jstream": "~0.2.7",
     "nomnom": "~1.6.1",
-    "progress-bar": "~0.1.1",
-    "request": "~2.36.0",
-    "streamify": "~0.2.0",
-    "underscore": "~1.6.0"
+    "progress-bar": "~0.1.1"
   },
   "devDependencies": {
-    "mocha": "x",
-    "nock": "~0.34.1",
-    "stream-equal": "~0.1.0"
+    "mocha": "x"
   },
   "licenses": [ {
     "type": "MIT",
