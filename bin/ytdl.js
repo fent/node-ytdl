@@ -127,7 +127,6 @@ if (opts.info) {
     console.log('formats:'.grey.bold);
     var colors = ['green', 'blue', 'green', 'blue', 'green', 'blue'];
     console.log(cliff.stringifyObjectRows(info.formats, cols, colors));
-    ytdl.cache.die();
   });
   return;
 }
@@ -217,9 +216,6 @@ if (output) {
       var percent = dataRead / format.size;
       bar.update(percent);
     });
-
-    ytdl.cache.die();
-
   });
 }
 
