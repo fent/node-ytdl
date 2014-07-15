@@ -75,6 +75,11 @@ var opts = require('nomnom')
     flag: true,
     help: 'Print video info without downloading'
   })
+  .option('printUrl', {
+    full: 'print-url',
+    flag: true,
+    help: 'Print direct download url'
+  })
   .script('ytdl')
   .colors()
   .parse()
@@ -185,6 +190,25 @@ ytdlOptions.filter = function(format) {
     return filter(format);
   });
 };
+
+if (opts.printUrl) {
+  ytdl.getInfo(opts.url, function(err, info) {
+    if (err) {
+      console.error(err.message);
+      process.exit(1);
+      return;
+    }
+    var coreUtil = require('ytdl-core/lib/util');
+    var format = coreUtil.chooseFormat(info.formats, ytdlOptions);
+    if (format instanceof Error) {
+      console.error(format.message);
+      process.exit(1);
+      return;
+    }
+    console.log(format.url);
+  });
+  return;
+}
 
 var readStream = ytdl(opts.url, ytdlOptions);
 readStream.pipe(writeStream);
