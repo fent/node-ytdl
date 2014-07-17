@@ -24,6 +24,7 @@ And it streams!
        --filter-encoding REGEXP       Filter in format encoding.
        --unfilter-encoding REGEXP     Filter out format encoding.
        -i, --info                     Print video info without downloading
+       --print-url                    Print direct download url
 
 # Install
 
