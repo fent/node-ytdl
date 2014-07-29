@@ -80,6 +80,10 @@ var opts = require('nomnom')
     flag: true,
     help: 'Print direct download url'
   })
+  .option('debug', {
+    flag: true,
+    help: 'Print debug information'
+  })
   .script('ytdl')
   .colors()
   .parse()
@@ -104,7 +108,7 @@ function printVideoInfo(info) {
 
 
 if (opts.info) {
-  ytdl.getInfo(opts.url, function(err, info) {
+  ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
     if (err) {
       console.error(err.message);
       process.exit(1);
@@ -192,7 +196,7 @@ ytdlOptions.filter = function(format) {
 };
 
 if (opts.printUrl) {
-  ytdl.getInfo(opts.url, function(err, info) {
+  ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
     if (err) {
       console.error(err.message);
       process.exit(1);
