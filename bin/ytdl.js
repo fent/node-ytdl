@@ -229,7 +229,8 @@ if (output) {
     console.log('container: '.grey.bold + format.container);
     console.log('resolution: '.grey.bold + format.resolution);
     console.log('encoding: '.grey.bold + format.encoding);
-    console.log('size: '.grey.bold + util.toHumanSize(format.size));
+    console.log('size: '.grey.bold + util.toHumanSize(format.size) +
+               ' (' + format.size +' bytes)');
     console.log('output: '.grey.bold + output);
     console.log();
 
