@@ -28,47 +28,47 @@ var opts = require('nomnom')
   .option('quality', {
     abbr: 'q',
     metavar: 'ITAG',
-    help: 'Video quality to download. Default: highest'
+    help: 'Video quality to download, Default: highest'
   })
   .option('range', {
     abbr: 'r',
     metavar: 'INT-INT',
-    help: 'Byte range to download. ie 10355705-12452856'
+    help: 'Byte range to download, ie 10355705-12452856'
   })
   .option('output', {
     abbr: 'o',
     metavar: 'FILE',
-    help: 'Where to save the file. Default: stdout'
+    help: 'Where to save the file, Default: stdout'
   })
   .option('filterContainer', {
     full: 'filter-container',
     metavar: 'REGEXP',
-    help: 'Filter in format container. Default: -o ext'
+    help: 'Filter in format container'
   })
   .option('unfilterContainer', {
     full: 'unfilter-container',
     metavar: 'REGEXP',
-    help: 'Filter out format container.'
+    help: 'Filter out format container'
   })
   .option('filterResolution', {
     full: 'filter-resolution',
     metavar: 'REGEXP',
-    help: 'Filter in format resolution.'
+    help: 'Filter in format resolution'
   })
   .option('unfilterResolution', {
     full: 'unfilter-resolution',
     metavar: 'REGEXP',
-    help: 'Filter out format resolution.'
+    help: 'Filter out format resolution'
   })
   .option('filterEncoding', {
     full: 'filter-encoding',
     metavar: 'REGEXP',
-    help: 'Filter in format encoding.'
+    help: 'Filter in format encoding'
   })
   .option('unfilterEncoding', {
     full: 'unfilter-encoding',
     metavar: 'REGEXP',
-    help: 'Filter out format encoding.'
+    help: 'Filter out format encoding'
   })
   .option('info', {
     abbr: 'i',
@@ -78,7 +78,7 @@ var opts = require('nomnom')
   .option('printUrl', {
     full: 'print-url',
     flag: true,
-    help: 'Print direct download url'
+    help: 'Print direct download URL'
   })
   .option('debug', {
     flag: true,
