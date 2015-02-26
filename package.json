@@ -26,7 +26,7 @@
   },
   "dependencies": {
     "cliff": "~0.1.8",
-    "colors": "~0.6.0-1",
+    "colors": "^1.0.3",
     "nomnom": "~1.8.0",
     "progress-bar": "~0.1.1",
     "ytdl-core": "*"
