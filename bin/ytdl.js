@@ -196,7 +196,10 @@ ytdlOptions.filter = function(format) {
 };
 
 if (opts.printUrl) {
-  ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
+  ytdl.getInfo(opts.url, {
+    downloadURL: true,
+    debug: opts.debug,
+  }, function(err, info) {
     if (err) {
       console.error(err.message);
       process.exit(1);
