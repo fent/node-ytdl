@@ -2,6 +2,7 @@
 
 var path  = require('path');
 var fs    = require('fs');
+var os    = require('os');
 var ytdl  = require('ytdl-core');
 var cliff = require('cliff');
 var util  = require('../lib/util');
@@ -88,6 +89,19 @@ var opts = require('nomnom')
   .colors()
   .parse()
   ;
+
+
+// Keep cache in file.
+var cachefile = path.resolve(os.homedir(), '.ytdl-cache.json');
+fs.readFile(cachefile, function(err, contents) {
+  if (err) return;
+  ytdl.cache.store = JSON.parse(contents);
+});
+
+ytdl.cache.set = function(key, value) {
+  ytdl.cache.store[key] = value;
+  fs.writeFile(cachefile, JSON.stringify(ytdl.cache.store, null, 2));
+};
 
 
 /**
