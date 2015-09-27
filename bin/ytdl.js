@@ -81,6 +81,11 @@ var opts = require('nomnom')
     flag: true,
     help: 'Print direct download URL'
   })
+  .option('noCache', {
+    full: 'no-cache',
+    flat: true,
+    help: 'Skip file cache for html5player'
+  })
   .option('debug', {
     flag: true,
     help: 'Print debug information'
@@ -91,17 +96,19 @@ var opts = require('nomnom')
   ;
 
 
-// Keep cache in file.
-var cachefile = path.resolve(os.homedir(), '.ytdl-cache.json');
-fs.readFile(cachefile, function(err, contents) {
-  if (err) return;
-  ytdl.cache.store = JSON.parse(contents);
-});
+if (opts.cache !== false) {
+  // Keep cache in file.
+  var cachefile = path.resolve(os.homedir(), '.ytdl-cache.json');
+  fs.readFile(cachefile, function(err, contents) {
+    if (err) return;
+    ytdl.cache.store = JSON.parse(contents);
+  });
 
-ytdl.cache.set = function(key, value) {
-  ytdl.cache.store[key] = value;
-  fs.writeFile(cachefile, JSON.stringify(ytdl.cache.store, null, 2));
-};
+  ytdl.cache.set = function(key, value) {
+    ytdl.cache.store[key] = value;
+    fs.writeFile(cachefile, JSON.stringify(ytdl.cache.store, null, 2));
+  };
+}
 
 
 /**
