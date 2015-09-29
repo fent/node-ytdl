@@ -39,7 +39,7 @@ var opts = require('nomnom')
   .option('output', {
     abbr: 'o',
     metavar: 'FILE',
-    help: 'Where to save the file, Default: stdout'
+    help: 'Where to write the file to, Default: stdout'
   })
   .option('filterContainer', {
     full: 'filter-container',
