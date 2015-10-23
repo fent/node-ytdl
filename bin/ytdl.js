@@ -174,7 +174,8 @@ if (output) {
 }
 
 var ytdlOptions = {};
-ytdlOptions.quality = opts.quality;
+ytdlOptions.quality = /,/.test(opts.quality) ?
+  opts.quality.split(',') : opts.quality;
 ytdlOptions.range = opts.range;
 
 // Create filters.

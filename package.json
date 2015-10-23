@@ -29,7 +29,7 @@
     "colors": "^1.0.3",
     "nomnom": "~1.8.0",
     "progress-bar": "~0.1.1",
-    "ytdl-core": "~0.7.2"
+    "ytdl-core": ">=0.7.3"
   },
   "devDependencies": {
     "mocha": "x"
