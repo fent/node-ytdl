@@ -162,15 +162,11 @@ if (opts.info) {
 }
 
 var output = opts.output;
-var writeStream;
 if (output) {
-  writeStream = fs.createWriteStream(output);
   var ext = path.extname(output);
   if (ext && !opts.quality && !opts.filterContainer) {
     opts.filterContainer = '^' + ext.slice(1) + '$';
   }
-} else {
-  writeStream = process.stdout;
 }
 
 var ytdlOptions = {};
@@ -240,7 +236,12 @@ if (opts.printUrl) {
 }
 
 var readStream = ytdl(opts.url, ytdlOptions);
-readStream.pipe(writeStream);
+var size;
+
+readStream.on('response', function(res) {
+  size = res.headers['content-length'];
+  res.pipe(output ? fs.createWriteStream(output) : process.stdout);
+});
 
 readStream.on('error', function(err) {
   console.error(err.message);
@@ -267,7 +268,7 @@ if (output) {
     var dataRead = 0;
     readStream.on('data', function(data) {
       dataRead += data.length;
-      var percent = dataRead / format.size;
+      var percent = dataRead / size;
       bar.update(percent);
     });
   });
