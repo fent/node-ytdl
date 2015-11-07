@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-var path  = require('path');
-var fs    = require('fs');
-var os    = require('os');
-var ytdl  = require('ytdl-core');
-var cliff = require('cliff');
-var util  = require('../lib/util');
+var path    = require('path');
+var fs      = require('fs');
+var ytdl    = require('ytdl-core');
+var cliff   = require('cliff');
+var homedir = require('homedir');
+var util    = require('../lib/util');
 require('colors');
 
 
@@ -98,7 +98,7 @@ var opts = require('nomnom')
 
 if (opts.cache !== false) {
   // Keep cache in file.
-  var cachefile = path.resolve(os.homedir(), '.ytdl-cache.json');
+  var cachefile = path.resolve(homedir(), '.ytdl-cache.json');
   fs.readFile(cachefile, function(err, contents) {
     if (err) return;
     ytdl.cache.store = JSON.parse(contents);
