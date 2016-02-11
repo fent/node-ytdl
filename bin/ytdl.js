@@ -236,27 +236,20 @@ if (opts.printUrl) {
 }
 
 var readStream = ytdl(opts.url, ytdlOptions);
-var size;
+var myinfo, myformat;
 
 readStream.on('response', function(res) {
-  size = res.headers['content-length'];
+  var size = res.headers['content-length'];
   res.pipe(output ? fs.createWriteStream(output) : process.stdout);
-});
 
-readStream.on('error', function(err) {
-  console.error(err.message);
-  process.exit(1);
-});
-
-// Print progress bar and some video info if not streaming to stdout.
-if (output) {
-  readStream.on('info', function(info, format) {
-    printVideoInfo(info);
-    console.log('container: '.grey.bold + format.container);
-    console.log('resolution: '.grey.bold + format.resolution);
-    console.log('encoding: '.grey.bold + format.encoding);
-    console.log('size: '.grey.bold + util.toHumanSize(format.size) +
-               ' (' + format.size +' bytes)');
+  if (output) {
+    // Print information about the video if not streaming to stdout.
+    printVideoInfo(myinfo);
+    console.log('container: '.grey.bold + myformat.container);
+    console.log('resolution: '.grey.bold + myformat.resolution);
+    console.log('encoding: '.grey.bold + myformat.encoding);
+    console.log('size: '.grey.bold + util.toHumanSize(size) +
+               ' (' + size +' bytes)');
     console.log('output: '.grey.bold + output);
     console.log();
 
@@ -271,8 +264,18 @@ if (output) {
       var percent = dataRead / size;
       bar.update(percent);
     });
-  });
-}
+  }
+});
+
+readStream.on('error', function(err) {
+  console.error(err.message);
+  process.exit(1);
+});
+
+readStream.on('info', function(info, format) {
+  myinfo = info;
+  myformat = format;
+});
 
 readStream.on('end', function onend() {
   console.log();
