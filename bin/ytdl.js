@@ -101,7 +101,9 @@ if (opts.cache !== false) {
   var cachefile = path.resolve(homedir(), '.ytdl-cache.json');
   fs.readFile(cachefile, function(err, contents) {
     if (err) return;
-    ytdl.cache.store = JSON.parse(contents);
+    try {
+      ytdl.cache.store = JSON.parse(contents);
+    } catch (err) {}
   });
 
   ytdl.cache.set = function(key, value) {
