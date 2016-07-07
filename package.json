@@ -19,7 +19,7 @@
     "ytdl": "./bin/ytdl.js"
   },
   "scripts": {
-    "test": "mocha -R spec test/*-test.js"
+    "test": "istanbul cover node_modules/.bin/_mocha -- test/*-test.js"
   },
   "directories": {
     "lib": "./lib"
@@ -33,6 +33,7 @@
     "ytdl-core": ">=0.7.3"
   },
   "devDependencies": {
+    "istanbul": "x",
     "mocha": "x"
   },
   "licenses": [
