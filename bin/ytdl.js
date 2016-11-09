@@ -242,7 +242,7 @@ var myinfo, myformat;
 
 readStream.on('response', function(res) {
   var size = res.headers['content-length'];
-  res.pipe(output ? fs.createWriteStream(output) : process.stdout);
+  readStream.pipe(output ? fs.createWriteStream(output) : process.stdout);
 
   if (output) {
     // Print information about the video if not streaming to stdout.
