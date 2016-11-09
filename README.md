@@ -8,7 +8,7 @@ A youtube downloader written in Javascript. To be used with the command line. If
 
 # Usage
 
-    ytdl http://www.youtube.com/watch?v=_HSylqgVYQI > myvideo.flv
+    ytdl http://www.youtube.com/watch?v=_HSylqgVYQI > myvideo.webm
 
 And it streams!
 
