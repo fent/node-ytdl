@@ -36,10 +36,5 @@
     "istanbul": "x",
     "mocha": "x"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "http://github.com/fent/node-ytdl/raw/master/LICENSE"
-    }
-  ]
+  "license": "MIT"
 }
