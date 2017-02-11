@@ -121,7 +121,7 @@ if (opts.cache !== false) {
 function printVideoInfo(info) {
   console.log();
   console.log('title: '.grey.bold + info.title);
-  console.log('author: '.grey.bold + info.author);
+  console.log('author: '.grey.bold + info.author.name);
   var rating = typeof info.avg_rating === 'number' ?
     info.avg_rating.toFixed(1) : info.avg_rating;
   console.log('average rating: '.grey.bold + rating);
