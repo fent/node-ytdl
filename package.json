@@ -28,6 +28,7 @@
     "cliff": "~0.1.8",
     "colors": "^1.0.3",
     "homedir": "^0.6.0",
+    "lodash.throttle": "^4.1.1",
     "nomnom": "~1.8.0",
     "progress-bar": "~0.1.1",
     "ytdl-core": ">=0.8.0"

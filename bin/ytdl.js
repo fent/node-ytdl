@@ -1,13 +1,5 @@
 #!/usr/bin/env node
 
-var path    = require('path');
-var fs      = require('fs');
-var ytdl    = require('ytdl-core');
-var cliff   = require('cliff');
-var homedir = require('homedir');
-var util    = require('../lib/util');
-require('colors');
-
 
 var info = require('../package');
 
@@ -96,6 +88,14 @@ var opts = require('nomnom')
   ;
 
 
+var path    = require('path');
+var fs      = require('fs');
+var ytdl    = require('ytdl-core');
+var homedir = require('homedir');
+var util    = require('../lib/util');
+require('colors');
+
+
 if (opts.cache !== false) {
   // Keep cache in file.
   var cachefile = path.resolve(homedir(), '.ytdl-cache.json');
@@ -122,15 +122,14 @@ function printVideoInfo(info) {
   console.log();
   console.log('title: '.grey.bold + info.title);
   console.log('author: '.grey.bold + info.author.name);
-  var rating = typeof info.avg_rating === 'number' ?
-    info.avg_rating.toFixed(1) : info.avg_rating;
-  console.log('average rating: '.grey.bold + rating);
+  console.log('average rating: '.grey.bold + info.avg_rating);
   console.log('view count: '.grey.bold + info.view_count);
   console.log('length: '.grey.bold + util.toHumanTime(info.length_seconds));
 }
 
 
 if (opts.info) {
+  var cliff    = require('cliff');
   ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
     if (err) {
       console.error(err.message);
@@ -225,8 +224,7 @@ if (opts.printUrl) {
       process.exit(1);
       return;
     }
-    var coreUtil = require('ytdl-core/lib/util');
-    var format = coreUtil.chooseFormat(info.formats, ytdlOptions);
+    var format = ytdl.chooseFormat(info.formats, ytdlOptions);
     if (format instanceof Error) {
       console.error(format.message);
       process.exit(1);
@@ -241,7 +239,7 @@ var readStream = ytdl(opts.url, ytdlOptions);
 var myinfo, myformat;
 
 readStream.on('response', function(res) {
-  var size = res.headers['content-length'];
+  var size = parseInt(res.headers['content-length'], 10);
   readStream.pipe(output ? fs.createWriteStream(output) : process.stdout);
 
   if (output) {
@@ -257,14 +255,29 @@ readStream.on('response', function(res) {
 
     // Create progress bar.
     var bar = require('progress-bar').create(process.stdout, 50);
+    var throttle = require('lodash.throttle');
     bar.format = '$bar; $percentage;%';
+
+    var lastPercent = null;
+    var updateBar = function() {
+      var percent = dataRead / size;
+      newPercent = Math.floor(percent * 100);
+      if (newPercent != lastPercent) {
+        lastPercent = newPercent;
+        bar.update(percent);
+      }
+    };
+    var updateBarThrottled = throttle(updateBar, 100, { trailing: false });
 
     // Keep track of progress.
     var dataRead = 0;
     readStream.on('data', function(data) {
       dataRead += data.length;
-      var percent = dataRead / size;
-      bar.update(percent);
+      if (dataRead === size) {
+        updateBar();
+      } else {
+        updateBarThrottled();
+      }
     });
   }
 });
