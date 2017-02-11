@@ -30,7 +30,7 @@
     "homedir": "^0.6.0",
     "nomnom": "~1.8.0",
     "progress-bar": "~0.1.1",
-    "ytdl-core": ">=0.7.3"
+    "ytdl-core": ">=0.8.0"
   },
   "devDependencies": {
     "istanbul": "x",
