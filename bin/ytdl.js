@@ -108,7 +108,7 @@ if (opts.cache !== false) {
 
   ytdl.cache.set = function(key, value) {
     ytdl.cache.store[key] = value;
-    fs.writeFile(cachefile, JSON.stringify(ytdl.cache.store, null, 2));
+    fs.writeFile(cachefile, JSON.stringify(ytdl.cache.store, null, 2), function() {});
   };
 }
 
