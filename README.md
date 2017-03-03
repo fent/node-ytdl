@@ -32,7 +32,7 @@ And it streams!
 
 # Install
 
-    [sudo] npm -g install ytdl
+    npm -g install ytdl
 
 
 # Tests
