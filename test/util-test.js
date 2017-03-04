@@ -36,7 +36,7 @@ describe('util.tmpl()', function() {
     });
   });
 
-  describe('Referencing a nested child', function() {
+  describe('Referencing a nested property with dot (.)', function() {
     it('Returns a templated string', function() {
       var rs = util.tmpl('Package is {mypkg.name} {pkg.version.str}', [{
         mypkg: { name: 'ytdl' },
