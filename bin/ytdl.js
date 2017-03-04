@@ -163,8 +163,8 @@ if (opts.info) {
 }
 
 var output = opts.output;
+var ext = path.extname(output || '');
 if (output) {
-  var ext = path.extname(output);
   if (ext && !opts.quality && !opts.filterContainer) {
     opts.filterContainer = '^' + ext.slice(1) + '$';
   }
@@ -215,10 +215,7 @@ ytdlOptions.filter = function(format) {
 };
 
 if (opts.printUrl) {
-  ytdl.getInfo(opts.url, {
-    downloadURL: true,
-    debug: opts.debug,
-  }, function(err, info) {
+  ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
     if (err) {
       console.error(err.message);
       process.exit(1);
@@ -238,58 +235,66 @@ if (opts.printUrl) {
 var readStream = ytdl(opts.url, ytdlOptions);
 var myinfo, myformat;
 
+readStream.on('info', function(info, format) {
+  myinfo = info;
+  myformat = format;
+});
+
 readStream.on('response', function(res) {
-  var size = parseInt(res.headers['content-length'], 10);
-  readStream.pipe(output ? fs.createWriteStream(output) : process.stdout);
-
-  if (output) {
-    // Print information about the video if not streaming to stdout.
-    printVideoInfo(myinfo);
-    console.log('container: '.grey.bold + myformat.container);
-    console.log('resolution: '.grey.bold + myformat.resolution);
-    console.log('encoding: '.grey.bold + myformat.encoding);
-    console.log('size: '.grey.bold + util.toHumanSize(size) +
-               ' (' + size +' bytes)');
-    console.log('output: '.grey.bold + output);
-    console.log();
-
-    // Create progress bar.
-    var bar = require('progress-bar').create(process.stdout, 50);
-    var throttle = require('lodash.throttle');
-    bar.format = '$bar; $percentage;%';
-
-    var lastPercent = null;
-    var updateBar = function() {
-      var percent = dataRead / size;
-      newPercent = Math.floor(percent * 100);
-      if (newPercent != lastPercent) {
-        lastPercent = newPercent;
-        bar.update(percent);
-      }
-    };
-    var updateBarThrottled = throttle(updateBar, 100, { trailing: false });
-
-    // Keep track of progress.
-    var dataRead = 0;
-    readStream.on('data', function(data) {
-      dataRead += data.length;
-      if (dataRead === size) {
-        updateBar();
-      } else {
-        updateBarThrottled();
-      }
-    });
+  if (!output) {
+    readStream.pipe(process.stdout);
+    return;
   }
+
+  if (!ext && myformat.container) {
+    output += '.' + myformat.container;
+  }
+  readStream.pipe(fs.createWriteStream(output));
+
+  // Print information about the video if not streaming to stdout.
+  printVideoInfo(myinfo);
+
+  // Print information about the format we're downloading.
+  var size = parseInt(res.headers['content-length'], 10);
+  console.log('container: '.grey.bold + myformat.container);
+  console.log('resolution: '.grey.bold + myformat.resolution);
+  console.log('encoding: '.grey.bold + myformat.encoding);
+  console.log('size: '.grey.bold + util.toHumanSize(size) +
+             ' (' + size +' bytes)');
+  console.log('output: '.grey.bold + output);
+  console.log();
+
+  // Create progress bar.
+  var bar = require('progress-bar').create(process.stdout, 50);
+  var throttle = require('lodash.throttle');
+  bar.format = '$bar; $percentage;%';
+
+  var lastPercent = null;
+  var updateBar = function() {
+    var percent = dataRead / size;
+    newPercent = Math.floor(percent * 100);
+    if (newPercent != lastPercent) {
+      lastPercent = newPercent;
+      bar.update(percent);
+    }
+  };
+  var updateBarThrottled = throttle(updateBar, 100, { trailing: false });
+
+  // Keep track of progress.
+  var dataRead = 0;
+  readStream.on('data', function(data) {
+    dataRead += data.length;
+    if (dataRead === size) {
+      updateBar();
+    } else {
+      updateBarThrottled();
+    }
+  });
 });
 
 readStream.on('error', function(err) {
   console.error(err.message);
   process.exit(1);
-});
-
-readStream.on('info', function(info, format) {
-  myinfo = info;
-  myformat = format;
 });
 
 readStream.on('end', function onend() {
