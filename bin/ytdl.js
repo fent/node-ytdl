@@ -21,7 +21,7 @@ var opts = require('nomnom')
   .option('quality', {
     abbr: 'q',
     metavar: 'ITAG',
-    help: 'Video quality to download, Default: highest'
+    help: 'Video quality to download, default: highest'
   })
   .option('range', {
     abbr: 'r',
@@ -31,7 +31,7 @@ var opts = require('nomnom')
   .option('output', {
     abbr: 'o',
     metavar: 'FILE',
-    help: 'Where to write the file to, Default: stdout'
+    help: 'Save to file, template by {prop}, default: stdout'
   })
   .option('filterContainer', {
     full: 'filter-container',
@@ -129,7 +129,7 @@ function printVideoInfo(info) {
 
 
 if (opts.info) {
-  var cliff    = require('cliff');
+  var cliff = require('cliff');
   ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
     if (err) {
       console.error(err.message);
@@ -163,7 +163,8 @@ if (opts.info) {
 }
 
 var output = opts.output;
-var ext = path.extname(output || '');
+var ext = (output || '').match(/(\.\w+)?$/)[1];
+
 if (output) {
   if (ext && !opts.quality && !opts.filterContainer) {
     opts.filterContainer = '^' + ext.slice(1) + '$';
@@ -246,6 +247,7 @@ readStream.on('response', function(res) {
     return;
   }
 
+  output = util.tmpl(output, [myinfo, myformat]);
   if (!ext && myformat.container) {
     output += '.' + myformat.container;
   }
