@@ -28,6 +28,11 @@ var opts = require('nomnom')
     metavar: 'INT-INT',
     help: 'Byte range to download, ie 10355705-12452856'
   })
+  .option('begin', {
+    abbr: 'b',
+    metavar: 'INT',
+    help: 'Time to begin video, format by 1:30.123 and 1m30s'
+  })
   .option('output', {
     abbr: 'o',
     metavar: 'FILE',
@@ -175,6 +180,7 @@ var ytdlOptions = {};
 ytdlOptions.quality = /,/.test(opts.quality) ?
   opts.quality.split(',') : opts.quality;
 ytdlOptions.range = opts.range;
+ytdlOptions.begin = opts.begin;
 
 // Create filters.
 var filters = [];

@@ -30,6 +30,7 @@ Supported options
        -v, --version                  Print program version.
        -q ITAG, --quality ITAG        Video quality to download, default: highest
        -r INT-INT, --range INT-INT    Byte range to download, ie 10355705-12452856
+       -b INT, --begin INT            Time to begin video, format by 1:30.123 and 1m30s
        -o FILE, --output FILE         Save to file, template by {prop}, default: stdout
        --filter-container REGEXP      Filter in format container
        --unfilter-container REGEXP    Filter out format container
