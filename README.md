@@ -10,7 +10,7 @@ A youtube downloader written in Javascript. To be used with the command line. If
 
 Streams to stdout by default
 
-    ytdl http://www.youtube.com/watch?v=_HSylqgVYQI | mpv
+    ytdl http://www.youtube.com/watch?v=_HSylqgVYQI | mpv -
 
 To save to a file
 
