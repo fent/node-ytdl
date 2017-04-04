@@ -240,35 +240,58 @@ if (opts.printUrl) {
 }
 
 var readStream = ytdl(opts.url, ytdlOptions);
-var myinfo, myformat;
+var liveBroadcast = false;
 
 readStream.on('info', function(info, format) {
-  myinfo = info;
-  myformat = format;
-});
-
-readStream.on('response', function(res) {
   if (!output) {
-    readStream.pipe(process.stdout);
+    readStream.pipe(process.stdout).on('error', function(err) {
+      console.error(err.message);
+      process.exit(1);
+    });
     return;
   }
 
-  output = util.tmpl(output, [myinfo, myformat]);
-  if (!ext && myformat.container) {
-    output += '.' + myformat.container;
+  output = util.tmpl(output, [info, format]);
+  if (!ext && format.container) {
+    output += '.' + format.container;
   }
-  readStream.pipe(fs.createWriteStream(output));
+  readStream.pipe(fs.createWriteStream(output)).on('error', function(err) {
+      console.error(err.message);
+      process.exit(1);
+    });
 
   // Print information about the video if not streaming to stdout.
-  printVideoInfo(myinfo);
+  printVideoInfo(info);
+
+  console.log('container: '.grey.bold + format.container);
+  console.log('resolution: '.grey.bold + format.resolution);
+  console.log('encoding: '.grey.bold + format.encoding);
+
+  liveBroadcast = info.live_default_broadcast === '1';
+  if (!liveBroadcast) { return; }
+
+  var throttle = require('lodash.throttle');
+  var dataRead = 0;
+  var updateProgress = throttle(function() {
+    process.stdout.cursorTo(0)
+    process.stdout.clearLine(1);
+    process.stdout.write('size: '.grey.bold + util.toHumanSize(dataRead) +
+                         ' (' + dataRead +' bytes)');
+  }, 500);
+
+  readStream.on('data', function(data) {
+    dataRead += data.length;
+    updateProgress();
+  });
+});
+
+readStream.on('response', function(res) {
+  if (!output || liveBroadcast) { return; }
 
   // Print information about the format we're downloading.
   var size = parseInt(res.headers['content-length'], 10);
-  console.log('container: '.grey.bold + myformat.container);
-  console.log('resolution: '.grey.bold + myformat.resolution);
-  console.log('encoding: '.grey.bold + myformat.encoding);
   console.log('size: '.grey.bold + util.toHumanSize(size) +
-             ' (' + size +' bytes)');
+              ' (' + size +' bytes)');
   console.log('output: '.grey.bold + output);
   console.log();
 
