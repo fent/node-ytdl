@@ -184,7 +184,10 @@ if (output) {
 var ytdlOptions = {};
 ytdlOptions.quality = /,/.test(opts.quality) ?
   opts.quality.split(',') : opts.quality;
-ytdlOptions.range = opts.range;
+if (opts.range) {
+  var s = opts.range.split('-');
+  ytdlOptions.range = { start: s[0], end: s[1] };
+}
 ytdlOptions.begin = opts.begin;
 
 // Create filters.
