@@ -14,6 +14,10 @@
   },
   "author": "fent (https://github.com/fent)",
   "main": "./lib/index.js",
+  "files": [
+    "bin",
+    "lib"
+  ],
   "preferGlobal": true,
   "bin": {
     "ytdl": "./bin/ytdl.js"
