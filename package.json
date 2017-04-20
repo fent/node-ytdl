@@ -7,13 +7,17 @@
     "video",
     "cli"
   ],
-  "version": "0.5.0",
+  "version": "0.5.1",
   "repository": {
     "type": "git",
     "url": "git://github.com/fent/node-ytdl.git"
   },
   "author": "fent (https://github.com/fent)",
   "main": "./lib/index.js",
+  "files": [
+    "bin",
+    "lib"
+  ],
   "preferGlobal": true,
   "bin": {
     "ytdl": "./bin/ytdl.js"
