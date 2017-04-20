@@ -32,6 +32,7 @@ Supported options
        -r INT-INT, --range INT-INT    Byte range to download, ie 10355705-12452856
        -b INT, --begin INT            Time to begin video, format by 1:30.123 and 1m30s
        -o FILE, --output FILE         Save to file, template by {prop}, default: stdout
+       --filter STR                   Can be video, videoonly, audio, audioonly
        --filter-container REGEXP      Filter in format container
        --unfilter-container REGEXP    Filter out format container
        --filter-resolution REGEXP     Filter in format resolution
@@ -50,7 +51,7 @@ Supported options
 
 
 # Tests
-Tests are written with [mocha](http://visionmedia.github.com/mocha/)
+Tests are written with [mocha](https://mochajs.org)
 
 ```bash
 npm test

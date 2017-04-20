@@ -38,6 +38,11 @@ var opts = require('nomnom')
     metavar: 'FILE',
     help: 'Save to file, template by {prop}, default: stdout'
   })
+  .option('filter', {
+    full: 'filter',
+    metavar: 'STR',
+    help: 'Can be video, videoonly, audio, audioonly'
+  })
   .option('filterContainer', {
     full: 'filter-container',
     metavar: 'REGEXP',
@@ -179,7 +184,10 @@ if (output) {
 var ytdlOptions = {};
 ytdlOptions.quality = /,/.test(opts.quality) ?
   opts.quality.split(',') : opts.quality;
-ytdlOptions.range = opts.range;
+if (opts.range) {
+  var s = opts.range.split('-');
+  ytdlOptions.range = { start: s[0], end: s[1] };
+}
 ytdlOptions.begin = opts.begin;
 
 // Create filters.
@@ -214,6 +222,34 @@ function createFilter(field, regexpStr, negated) {
     createFilter(field, opts[key], true);
   }
 });
+
+// Support basic ytdl-core filters manually, so that other
+// cli filters are supported when used together.
+switch (opts.filter) {
+  case 'video':
+    filters.push(function(format) {
+      return format.bitrate;
+    });
+    break;
+
+  case 'videoonly':
+    filters.push(function(format) {
+      return format.bitrate && !format.audioBitrate;
+    });
+    break;
+
+  case 'audio':
+    filters.push(function(format) {
+      return format.audioBitrate;
+    });
+    break;
+
+  case 'audioonly':
+    filters.push(function(format) {
+      return !format.bitrate && format.audioBitrate;
+    });
+    break;
+}
 
 ytdlOptions.filter = function(format) {
   return filters.every(function(filter) {
