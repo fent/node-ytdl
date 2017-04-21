@@ -113,7 +113,9 @@ if (opts.cache !== false) {
     if (err) return;
     try {
       ytdl.cache.store = JSON.parse(contents);
-    } catch (err) {}
+    } catch (err) {
+      console.error(err.message);
+    }
   });
 
   ytdl.cache.set = function(key, value) {
@@ -169,206 +171,207 @@ if (opts.info) {
     var colors = ['green', 'blue', 'green', 'blue', 'green', 'blue'];
     console.log(cliff.stringifyObjectRows(info.formats, cols, colors));
   });
-  return;
-}
 
-var output = opts.output;
-var ext = (output || '').match(/(\.\w+)?$/)[1];
+} else {
+  var output = opts.output;
+  var ext = (output || '').match(/(\.\w+)?$/)[1];
 
-if (output) {
-  if (ext && !opts.quality && !opts.filterContainer) {
-    opts.filterContainer = '^' + ext.slice(1) + '$';
-  }
-}
-
-var ytdlOptions = {};
-ytdlOptions.quality = /,/.test(opts.quality) ?
-  opts.quality.split(',') : opts.quality;
-if (opts.range) {
-  var s = opts.range.split('-');
-  ytdlOptions.range = { start: s[0], end: s[1] };
-}
-ytdlOptions.begin = opts.begin;
-
-// Create filters.
-var filters = [];
-
-/**
- * @param {String} field
- * @param {String} regexpStr
- * @param {Boolean|null} negated
- */
-function createFilter(field, regexpStr, negated) {
-  try {
-    var regexp = new RegExp(regexpStr, 'i');
-  } catch (err) {
-    console.error(err.message);
-    process.exit(1);
+  if (output) {
+    if (ext && !opts.quality && !opts.filterContainer) {
+      opts.filterContainer = '^' + ext.slice(1) + '$';
+    }
   }
 
-  filters.push(function(format) {
-    return negated !== regexp.test(format[field]);
-  });
-}
-
-['container', 'resolution', 'encoding'].forEach(function(field) {
-  var key = 'filter' + field[0].toUpperCase() + field.slice(1);
-  if (opts[key]) {
-    createFilter(field, opts[key], false);
+  var ytdlOptions = {};
+  ytdlOptions.quality = /,/.test(opts.quality) ?
+    opts.quality.split(',') : opts.quality;
+  if (opts.range) {
+    var s = opts.range.split('-');
+    ytdlOptions.range = { start: s[0], end: s[1] };
   }
+  ytdlOptions.begin = opts.begin;
 
-  key = 'un' + key;
-  if (opts[key]) {
-    createFilter(field, opts[key], true);
-  }
-});
+  // Create filters.
+  var filters = [];
 
-// Support basic ytdl-core filters manually, so that other
-// cli filters are supported when used together.
-switch (opts.filter) {
-  case 'video':
-    filters.push(function(format) {
-      return format.bitrate;
-    });
-    break;
-
-  case 'videoonly':
-    filters.push(function(format) {
-      return format.bitrate && !format.audioBitrate;
-    });
-    break;
-
-  case 'audio':
-    filters.push(function(format) {
-      return format.audioBitrate;
-    });
-    break;
-
-  case 'audioonly':
-    filters.push(function(format) {
-      return !format.bitrate && format.audioBitrate;
-    });
-    break;
-}
-
-ytdlOptions.filter = function(format) {
-  return filters.every(function(filter) {
-    return filter(format);
-  });
-};
-
-if (opts.printUrl) {
-  ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
-    if (err) {
+  /**
+   * @param {String} field
+   * @param {String} regexpStr
+   * @param {Boolean|null} negated
+   */
+  var createFilter = function(field, regexpStr, negated) {
+    try {
+      var regexp = new RegExp(regexpStr, 'i');
+    } catch (err) {
       console.error(err.message);
       process.exit(1);
-      return;
     }
-    var format = ytdl.chooseFormat(info.formats, ytdlOptions);
-    if (format instanceof Error) {
-      console.error(format.message);
-      process.exit(1);
-      return;
-    }
-    console.log(format.url);
-  });
-  return;
-}
 
-var readStream = ytdl(opts.url, ytdlOptions);
-var liveBroadcast = false;
-
-readStream.on('info', function(info, format) {
-  if (!output) {
-    readStream.pipe(process.stdout).on('error', function(err) {
-      console.error(err.message);
-      process.exit(1);
+    filters.push(function(format) {
+      return negated !== regexp.test(format[field]);
     });
-    return;
-  }
-
-  output = util.tmpl(output, [info, format]);
-  if (!ext && format.container) {
-    output += '.' + format.container;
-  }
-  readStream.pipe(fs.createWriteStream(output)).on('error', function(err) {
-      console.error(err.message);
-      process.exit(1);
-    });
-
-  // Print information about the video if not streaming to stdout.
-  printVideoInfo(info);
-
-  console.log('container: '.grey.bold + format.container);
-  console.log('resolution: '.grey.bold + format.resolution);
-  console.log('encoding: '.grey.bold + format.encoding);
-
-  liveBroadcast = info.live_default_broadcast === '1';
-  if (!liveBroadcast) { return; }
-
-  var throttle = require('lodash.throttle');
-  var dataRead = 0;
-  var updateProgress = throttle(function() {
-    process.stdout.cursorTo(0)
-    process.stdout.clearLine(1);
-    process.stdout.write('size: '.grey.bold + util.toHumanSize(dataRead) +
-                         ' (' + dataRead +' bytes)');
-  }, 500);
-
-  readStream.on('data', function(data) {
-    dataRead += data.length;
-    updateProgress();
-  });
-});
-
-readStream.on('response', function(res) {
-  if (!output || liveBroadcast) { return; }
-
-  // Print information about the format we're downloading.
-  var size = parseInt(res.headers['content-length'], 10);
-  console.log('size: '.grey.bold + util.toHumanSize(size) +
-              ' (' + size +' bytes)');
-  console.log('output: '.grey.bold + output);
-  console.log();
-
-  // Create progress bar.
-  var bar = require('progress-bar').create(process.stdout, 50);
-  var throttle = require('lodash.throttle');
-  bar.format = '$bar; $percentage;%';
-
-  var lastPercent = null;
-  var updateBar = function() {
-    var percent = dataRead / size;
-    newPercent = Math.floor(percent * 100);
-    if (newPercent != lastPercent) {
-      lastPercent = newPercent;
-      bar.update(percent);
-    }
   };
-  var updateBarThrottled = throttle(updateBar, 100, { trailing: false });
 
-  // Keep track of progress.
-  var dataRead = 0;
-  readStream.on('data', function(data) {
-    dataRead += data.length;
-    if (dataRead === size) {
-      updateBar();
-    } else {
-      updateBarThrottled();
+  ['container', 'resolution', 'encoding'].forEach(function(field) {
+    var key = 'filter' + field[0].toUpperCase() + field.slice(1);
+    if (opts[key]) {
+      createFilter(field, opts[key], false);
+    }
+
+    key = 'un' + key;
+    if (opts[key]) {
+      createFilter(field, opts[key], true);
     }
   });
-});
 
-readStream.on('error', function(err) {
-  console.error(err.message);
-  process.exit(1);
-});
+  // Support basic ytdl-core filters manually, so that other
+  // cli filters are supported when used together.
+  switch (opts.filter) {
+    case 'video':
+      filters.push(function(format) {
+        return format.bitrate;
+      });
+      break;
 
-readStream.on('end', function onend() {
-  console.log();
-});
+    case 'videoonly':
+      filters.push(function(format) {
+        return format.bitrate && !format.audioBitrate;
+      });
+      break;
 
-process.on('SIGINT', function onsigint() {
-  console.log();
-  process.exit();
-});
+    case 'audio':
+      filters.push(function(format) {
+        return format.audioBitrate;
+      });
+      break;
+
+    case 'audioonly':
+      filters.push(function(format) {
+        return !format.bitrate && format.audioBitrate;
+      });
+      break;
+  }
+
+  ytdlOptions.filter = function(format) {
+    return filters.every(function(filter) {
+      return filter(format);
+    });
+  };
+
+  if (opts.printUrl) {
+    ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
+      if (err) {
+        console.error(err.message);
+        process.exit(1);
+        return;
+      }
+      var format = ytdl.chooseFormat(info.formats, ytdlOptions);
+      if (format instanceof Error) {
+        console.error(format.message);
+        process.exit(1);
+        return;
+      }
+      console.log(format.url);
+    });
+
+  } else {
+    var readStream = ytdl(opts.url, ytdlOptions);
+    var liveBroadcast = false;
+
+    readStream.on('info', function(info, format) {
+      if (!output) {
+        readStream.pipe(process.stdout).on('error', function(err) {
+          console.error(err.message);
+          process.exit(1);
+        });
+        return;
+      }
+
+      output = util.tmpl(output, [info, format]);
+      if (!ext && format.container) {
+        output += '.' + format.container;
+      }
+      readStream.pipe(fs.createWriteStream(output))
+        .on('error', function(err) {
+          console.error(err.message);
+          process.exit(1);
+        });
+
+      // Print information about the video if not streaming to stdout.
+      printVideoInfo(info);
+
+      console.log('container: '.grey.bold + format.container);
+      console.log('resolution: '.grey.bold + format.resolution);
+      console.log('encoding: '.grey.bold + format.encoding);
+
+      liveBroadcast = format.live;
+      if (!liveBroadcast) { return; }
+
+      var throttle = require('lodash.throttle');
+      var dataRead = 0;
+      var updateProgress = throttle(function() {
+        process.stdout.cursorTo(0);
+        process.stdout.clearLine(1);
+        process.stdout.write('size: '.grey.bold + util.toHumanSize(dataRead) +
+                             ' (' + dataRead +' bytes)');
+      }, 500);
+
+      readStream.on('data', function(data) {
+        dataRead += data.length;
+        updateProgress();
+      });
+    });
+
+    readStream.on('response', function(res) {
+      if (!output || liveBroadcast) { return; }
+
+      // Print information about the format we're downloading.
+      var size = parseInt(res.headers['content-length'], 10);
+      console.log('size: '.grey.bold + util.toHumanSize(size) +
+                  ' (' + size +' bytes)');
+      console.log('output: '.grey.bold + output);
+      console.log();
+
+      // Create progress bar.
+      var bar = require('progress-bar').create(process.stdout, 50);
+      var throttle = require('lodash.throttle');
+      bar.format = '$bar; $percentage;%';
+
+      var lastPercent = null;
+      var updateBar = function() {
+        var percent = dataRead / size;
+        var newPercent = Math.floor(percent * 100);
+        if (newPercent != lastPercent) {
+          lastPercent = newPercent;
+          bar.update(percent);
+        }
+      };
+      var updateBarThrottled = throttle(updateBar, 100, { trailing: false });
+
+      // Keep track of progress.
+      var dataRead = 0;
+      readStream.on('data', function(data) {
+        dataRead += data.length;
+        if (dataRead === size) {
+          updateBar();
+        } else {
+          updateBarThrottled();
+        }
+      });
+    });
+
+    readStream.on('error', function(err) {
+      console.error(err.message);
+      process.exit(1);
+    });
+
+    readStream.on('end', function onend() {
+      console.log();
+    });
+
+    process.on('SIGINT', function onsigint() {
+      console.log();
+      process.exit();
+    });
+  }
+}
