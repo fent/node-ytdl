@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 
-var info = require('../package');
+const info = require('../package');
 
 var opts = require('nomnom')
   .option('version', {
@@ -98,14 +98,14 @@ var opts = require('nomnom')
   ;
 
 
-var path    = require('path');
-var fs      = require('fs');
-var ytdl    = require('ytdl-core');
-var homedir = require('homedir');
-var util    = require('../lib/util');
+const path    = require('path');
+const fs      = require('fs');
+const ytdl    = require('ytdl-core');
+const homedir = require('homedir');
+const util    = require('../lib/util');
 
-var chalk   = require('chalk');
-var label = chalk.bold.gray;
+const chalk = require('chalk');
+const label = chalk.bold.gray;
 
 
 if (opts.cache !== false) {
@@ -143,7 +143,7 @@ function printVideoInfo(info) {
 
 
 if (opts.info) {
-  var cliff = require('cliff');
+  const cliff = require('cliff');
   ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
     if (err) {
       console.error(err.message);
@@ -309,7 +309,7 @@ if (opts.info) {
       liveBroadcast = format.live;
       if (!liveBroadcast) { return; }
 
-      var throttle = require('lodash.throttle');
+      const throttle = require('lodash.throttle');
       var dataRead = 0;
       var updateProgress = throttle(function() {
         process.stdout.cursorTo(0);
@@ -335,8 +335,8 @@ if (opts.info) {
       console.log();
 
       // Create progress bar.
-      var bar = require('progress-bar').create(process.stdout, 50);
-      var throttle = require('lodash.throttle');
+      const bar = require('progress-bar').create(process.stdout, 50);
+      const throttle = require('lodash.throttle');
       bar.format = '$bar; $percentage;%';
 
       var lastPercent = null;
