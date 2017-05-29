@@ -103,7 +103,9 @@ var fs      = require('fs');
 var ytdl    = require('ytdl-core');
 var homedir = require('homedir');
 var util    = require('../lib/util');
-require('colors');
+
+var chalk   = require('chalk');
+var label = chalk.bold.gray;
 
 
 if (opts.cache !== false) {
@@ -132,11 +134,11 @@ if (opts.cache !== false) {
  */
 function printVideoInfo(info) {
   console.log();
-  console.log('title: '.grey.bold + info.title);
-  console.log('author: '.grey.bold + info.author.name);
-  console.log('average rating: '.grey.bold + info.avg_rating);
-  console.log('view count: '.grey.bold + info.view_count);
-  console.log('length: '.grey.bold + util.toHumanTime(info.length_seconds));
+  console.log(label('title: ') + info.title);
+  console.log(label('author: ') + info.author.name);
+  console.log(label('average rating: ') + info.avg_rating);
+  console.log(label('view count: ') + info.view_count);
+  console.log(label('length: ') + util.toHumanTime(info.length_seconds));
 }
 
 
@@ -167,7 +169,7 @@ if (opts.info) {
         format[col] = format[col] || '';
       });
     });
-    console.log('formats:'.grey.bold);
+    console.log(label('formats:'));
     var colors = ['green', 'blue', 'green', 'blue', 'green', 'blue'];
     console.log(cliff.stringifyObjectRows(info.formats, cols, colors));
   });
@@ -300,9 +302,9 @@ if (opts.info) {
       // Print information about the video if not streaming to stdout.
       printVideoInfo(info);
 
-      console.log('container: '.grey.bold + format.container);
-      console.log('resolution: '.grey.bold + format.resolution);
-      console.log('encoding: '.grey.bold + format.encoding);
+      console.log(label('container: ') + format.container);
+      console.log(label('resolution: ') + format.resolution);
+      console.log(label('encoding: ') + format.encoding);
 
       liveBroadcast = format.live;
       if (!liveBroadcast) { return; }
@@ -312,7 +314,7 @@ if (opts.info) {
       var updateProgress = throttle(function() {
         process.stdout.cursorTo(0);
         process.stdout.clearLine(1);
-        process.stdout.write('size: '.grey.bold + util.toHumanSize(dataRead) +
+        process.stdout.write(label('size: ') + util.toHumanSize(dataRead) +
                              ' (' + dataRead +' bytes)');
       }, 500);
 
@@ -327,9 +329,9 @@ if (opts.info) {
 
       // Print information about the format we're downloading.
       var size = parseInt(res.headers['content-length'], 10);
-      console.log('size: '.grey.bold + util.toHumanSize(size) +
+      console.log(label('size: ') + util.toHumanSize(size) +
                   ' (' + size +' bytes)');
-      console.log('output: '.grey.bold + output);
+      console.log(label('output: ') + output);
       console.log();
 
       // Create progress bar.
