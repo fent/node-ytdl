@@ -147,15 +147,6 @@ function printVideoInfo(info) {
   console.log(label('length: ') + util.toHumanTime(info.length_seconds));
 }
 
-/**
- * Prints basic video information as JSON.
- *
- * @param {Object} info
- */
-function printVideoInfoJson(info) {
-  console.log(JSON.stringify(info));
-}
-
 if (opts.infoJson) {
   ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
     if (err) {
@@ -163,7 +154,7 @@ if (opts.infoJson) {
       process.exit(1);
       return;
     }
-    printVideoInfoJson(info);
+    console.log(JSON.stringify(info));
   });
 } else if (opts.info) {
   const cliff = require('cliff');
