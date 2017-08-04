@@ -39,7 +39,8 @@ Supported options
        --unfilter-resolution REGEXP   Filter out format resolution
        --filter-encoding REGEXP       Filter in format encoding
        --unfilter-encoding REGEXP     Filter out format encoding
-        -i, --info                     Print video info without downloading
+       -i, --info                     Print video info without downloading
+       -j, --info-json                Print video info as JSON without downloading
        --print-url                    Print direct download URL
        --no-cache                     Skip file cache for html5player
        --debug                        Print debug information

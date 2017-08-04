@@ -78,6 +78,12 @@ var opts = require('nomnom')
     flag: true,
     help: 'Print video info without downloading'
   })
+  .option('infoJson', {
+    full: 'info-json',
+    abbr: 'j',
+    flag: true,
+    help: 'Print video info as JSON without downloading'
+  })
   .option('printUrl', {
     full: 'print-url',
     flag: true,
@@ -141,8 +147,16 @@ function printVideoInfo(info) {
   console.log(label('length: ') + util.toHumanTime(info.length_seconds));
 }
 
-
-if (opts.info) {
+if (opts.infoJson) {
+  ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
+    if (err) {
+      console.error(err.message);
+      process.exit(1);
+      return;
+    }
+    console.log(JSON.stringify(info));
+  });
+} else if (opts.info) {
   const cliff = require('cliff');
   ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
     if (err) {
