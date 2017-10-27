@@ -115,19 +115,21 @@ const label = chalk.bold.gray;
 if (opts.cache !== false) {
   // Keep cache in file.
   var cachefile = path.resolve(homedir(), '.ytdl-cache.json');
+  var cache = {};
   fs.readFile(cachefile, (err, contents) => {
     if (err) return;
     try {
-      ytdl.cache.store = JSON.parse(contents);
+      cache = JSON.parse(contents);
     } catch (err) {
-      console.error(err.message);
+      console.error(`Badly formatted cachefile (${cachefile}): ${err.message}`);
     }
   });
 
+  ytdl.cache.get = key => cache[key];
   ytdl.cache.set = (key, value) => {
-    ytdl.cache.store[key] = value;
+    cache[key] = value;
     fs.writeFile(cachefile,
-      JSON.stringify(ytdl.cache.store, null, 2), () => {});
+      JSON.stringify(cache, null, 2), () => {});
   };
 }
 
