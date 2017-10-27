@@ -1,33 +1,33 @@
-var util   = require('../lib/util');
-var assert = require('assert');
+const util   = require('../lib/util');
+const assert = require('assert');
 
 
-describe('util.toHumanTime()', function() {
-  it('Returns correctly formatted time', function() {
+describe('util.toHumanTime()', () => {
+  it('Returns correctly formatted time', () => {
     assert.equal(util.toHumanTime(60 * 20 + 30), '20:30');
     assert.equal(util.toHumanTime(60 * 60 * 4 + 60 * 8 + 8), '4:08:08');
     assert.equal(util.toHumanTime(60 * 60 * 4 + 60 * 30 + 8), '4:30:08');
   });
 });
 
-describe('util.toHumanSize()', function() {
-  it('Returns correctly formatted size', function() {
+describe('util.toHumanSize()', () => {
+  it('Returns correctly formatted size', () => {
     assert.equal(util.toHumanSize(1 << 3), '8B');
     assert.equal(util.toHumanSize((1 << 10) * 4.5), '4.5KB');
     assert.equal(util.toHumanSize(0), '0');
   });
 });
 
-describe('util.tmpl()', function() {
-  describe('With one match', function() {
-    it('Returns a templated string', function() {
+describe('util.tmpl()', () => {
+  describe('With one match', () => {
+    it('Returns a templated string', () => {
       var rs = util.tmpl('hello {title}', [{ title: 'world' }]);
       assert.equal(rs, 'hello world');
     });
   });
 
-  describe('With several matches', function() {
-    it('Returns a templated string', function() {
+  describe('With several matches', () => {
+    it('Returns a templated string', () => {
       var rs = util.tmpl('The {biganimal} jumped over the {smallanimal}', [{
         biganimal: 'dog',
         smallanimal: 'frog',
@@ -36,8 +36,8 @@ describe('util.tmpl()', function() {
     });
   });
 
-  describe('Referencing a nested property with dot (.)', function() {
-    it('Returns a templated string', function() {
+  describe('Referencing a nested property with dot (.)', () => {
+    it('Returns a templated string', () => {
       var rs = util.tmpl('Package is {mypkg.name} {pkg.version.str}', [{
         mypkg: { name: 'ytdl' },
         pkg: { version: { str: 'v0.4.2' } },
@@ -47,8 +47,8 @@ describe('util.tmpl()', function() {
     });
   });
 
-  describe('With several context objects', function() {
-    it('Returns a templated string', function() {
+  describe('With several context objects', () => {
+    it('Returns a templated string', () => {
       var rs = util.tmpl('Video is {title}.{container}', [
         { title: 'super mario' },
         { container: 'mp4' },
@@ -57,8 +57,8 @@ describe('util.tmpl()', function() {
     });
   });
 
-  describe('With no match', function() {
-    it('Returns a templated string', function() {
+  describe('With no match', () => {
+    it('Returns a templated string', () => {
       var rs = util.tmpl('My name is {name}', [{ what:'nothing here' }]);
       assert.equal(rs, 'My name is {name}');
     });

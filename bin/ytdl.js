@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 
-
 const info = require('../package');
-
-var opts = require('nomnom')
+const opts = require('nomnom')
   .option('version', {
     abbr: 'v',
     flag: true,
-    callback: function() {
+    callback: () => {
       console.log(info.version);
       process.exit();
     },
@@ -117,7 +115,7 @@ const label = chalk.bold.gray;
 if (opts.cache !== false) {
   // Keep cache in file.
   var cachefile = path.resolve(homedir(), '.ytdl-cache.json');
-  fs.readFile(cachefile, function(err, contents) {
+  fs.readFile(cachefile, (err, contents) => {
     if (err) return;
     try {
       ytdl.cache.store = JSON.parse(contents);
@@ -126,9 +124,10 @@ if (opts.cache !== false) {
     }
   });
 
-  ytdl.cache.set = function(key, value) {
+  ytdl.cache.set = (key, value) => {
     ytdl.cache.store[key] = value;
-    fs.writeFile(cachefile, JSON.stringify(ytdl.cache.store, null, 2), function() {});
+    fs.writeFile(cachefile,
+      JSON.stringify(ytdl.cache.store, null, 2), () => {});
   };
 }
 
@@ -148,7 +147,7 @@ function printVideoInfo(info) {
 }
 
 if (opts.infoJson) {
-  ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
+  ytdl.getInfo(opts.url, { debug: opts.debug }, (err, info) => {
     if (err) {
       console.error(err.message);
       process.exit(1);
@@ -158,7 +157,7 @@ if (opts.infoJson) {
   });
 } else if (opts.info) {
   const cliff = require('cliff');
-  ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
+  ytdl.getInfo(opts.url, { debug: opts.debug }, (err, info) => {
     if (err) {
       console.error(err.message);
       process.exit(1);
@@ -175,11 +174,11 @@ if (opts.infoJson) {
       'audio bitrate',
       'audio enc'
     ];
-    info.formats.forEach(function(format) {
+    info.formats.forEach((format) => {
       format['video enc']     = format.encoding;
       format['audio bitrate'] = format.audioBitrate;
       format['audio enc']     = format.audioEncoding;
-      cols.forEach(function(col) {
+      cols.forEach((col) => {
         format[col] = format[col] || '';
       });
     });
@@ -215,7 +214,7 @@ if (opts.infoJson) {
    * @param {String} regexpStr
    * @param {Boolean|null} negated
    */
-  var createFilter = function(field, regexpStr, negated) {
+  var createFilter = (field, regexpStr, negated) => {
     try {
       var regexp = new RegExp(regexpStr, 'i');
     } catch (err) {
@@ -223,12 +222,10 @@ if (opts.infoJson) {
       process.exit(1);
     }
 
-    filters.push(function(format) {
-      return negated !== regexp.test(format[field]);
-    });
+    filters.push(format => negated !== regexp.test(format[field]));
   };
 
-  ['container', 'resolution', 'encoding'].forEach(function(field) {
+  ['container', 'resolution', 'encoding'].forEach((field) => {
     var key = 'filter' + field[0].toUpperCase() + field.slice(1);
     if (opts[key]) {
       createFilter(field, opts[key], false);
@@ -244,38 +241,28 @@ if (opts.infoJson) {
   // cli filters are supported when used together.
   switch (opts.filter) {
     case 'video':
-      filters.push(function(format) {
-        return format.bitrate;
-      });
+      filters.push(format => format.bitrate);
       break;
 
     case 'videoonly':
-      filters.push(function(format) {
-        return format.bitrate && !format.audioBitrate;
-      });
+      filters.push(format => format.bitrate && !format.audioBitrate);
       break;
 
     case 'audio':
-      filters.push(function(format) {
-        return format.audioBitrate;
-      });
+      filters.push(format => format.audioBitrate);
       break;
 
     case 'audioonly':
-      filters.push(function(format) {
-        return !format.bitrate && format.audioBitrate;
-      });
+      filters.push(format => !format.bitrate && format.audioBitrate);
       break;
   }
 
-  ytdlOptions.filter = function(format) {
-    return filters.every(function(filter) {
-      return filter(format);
-    });
+  ytdlOptions.filter = (format) => {
+    return filters.every(filter => filter(format));
   };
 
   if (opts.printUrl) {
-    ytdl.getInfo(opts.url, { debug: opts.debug }, function(err, info) {
+    ytdl.getInfo(opts.url, { debug: opts.debug }, (err, info) => {
       if (err) {
         console.error(err.message);
         process.exit(1);
@@ -294,9 +281,9 @@ if (opts.infoJson) {
     var readStream = ytdl(opts.url, ytdlOptions);
     var liveBroadcast = false;
 
-    readStream.on('info', function(info, format) {
+    readStream.on('info', (info, format) => {
       if (!output) {
-        readStream.pipe(process.stdout).on('error', function(err) {
+        readStream.pipe(process.stdout).on('error', (err) => {
           console.error(err.message);
           process.exit(1);
         });
@@ -308,7 +295,7 @@ if (opts.infoJson) {
         output += '.' + format.container;
       }
       readStream.pipe(fs.createWriteStream(output))
-        .on('error', function(err) {
+        .on('error', (err) => {
           console.error(err.message);
           process.exit(1);
         });
@@ -325,20 +312,20 @@ if (opts.infoJson) {
 
       const throttle = require('lodash.throttle');
       var dataRead = 0;
-      var updateProgress = throttle(function() {
+      var updateProgress = throttle(() => {
         process.stdout.cursorTo(0);
         process.stdout.clearLine(1);
         process.stdout.write(label('size: ') + util.toHumanSize(dataRead) +
                              ' (' + dataRead +' bytes)');
       }, 500);
 
-      readStream.on('data', function(data) {
+      readStream.on('data', (data) => {
         dataRead += data.length;
         updateProgress();
       });
     });
 
-    readStream.on('response', function(res) {
+    readStream.on('response', (res) => {
       if (!output || liveBroadcast) { return; }
 
       // Print information about the format we're downloading.
@@ -354,7 +341,7 @@ if (opts.infoJson) {
       bar.format = '$bar; $percentage;%';
 
       var lastPercent = null;
-      var updateBar = function() {
+      var updateBar = () => {
         var percent = dataRead / size;
         var newPercent = Math.floor(percent * 100);
         if (newPercent != lastPercent) {
@@ -366,7 +353,7 @@ if (opts.infoJson) {
 
       // Keep track of progress.
       var dataRead = 0;
-      readStream.on('data', function(data) {
+      readStream.on('data', (data) => {
         dataRead += data.length;
         if (dataRead === size) {
           updateBar();
@@ -376,16 +363,16 @@ if (opts.infoJson) {
       });
     });
 
-    readStream.on('error', function(err) {
+    readStream.on('error', (err) => {
       console.error(err.message);
       process.exit(1);
     });
 
-    readStream.on('end', function onend() {
+    readStream.on('end', () => {
       console.log();
     });
 
-    process.on('SIGINT', function onsigint() {
+    process.on('SIGINT', () => {
       console.log();
       process.exit();
     });
