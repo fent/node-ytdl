@@ -102,11 +102,12 @@ const opts = require('nomnom')
   ;
 
 
-const path    = require('path');
-const fs      = require('fs');
-const ytdl    = require('ytdl-core');
-const homedir = require('homedir');
-const util    = require('../lib/util');
+const path         = require('path');
+const fs           = require('fs');
+const ytdl         = require('ytdl-core');
+const homedir      = require('homedir');
+const util         = require('../lib/util');
+const sanitizeName = require('sanitize-filename');
 
 const chalk = require('chalk');
 const label = chalk.bold.gray;
@@ -296,6 +297,14 @@ if (opts.infoJson) {
       if (!ext && format.container) {
         output += '.' + format.container;
       }
+
+      // Parses & sanitises output filename for any illegal charcters
+      var parsedOutput = path.posix.parse(output);
+      output = path.format({
+        dir: parsedOutput.dir,
+        base: sanitizeName(parsedOutput.base)
+      });
+
       readStream.pipe(fs.createWriteStream(output))
         .on('error', (err) => {
           console.error(err.message);
