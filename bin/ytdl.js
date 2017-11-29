@@ -299,7 +299,7 @@ if (opts.infoJson) {
       }
 
       // Parses & sanitises output filename for any illegal characters
-      var parsedOutput = path.posix.parse(output);
+      var parsedOutput = path.parse(output);
       output = path.format({
         dir: parsedOutput.dir,
         base: sanitizeName(parsedOutput.base)
