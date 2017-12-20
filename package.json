@@ -36,7 +36,7 @@
     "nomnom": "~1.8.0",
     "progress-bar": "~0.1.1",
     "sanitize-filename": "^1.6.1",
-    "ytdl-core": ">=0.10.0"
+    "ytdl-core": "^0.18.4"
   },
   "devDependencies": {
     "istanbul": "^0.4.5",
