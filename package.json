@@ -35,6 +35,7 @@
     "lodash.throttle": "^4.1.1",
     "nomnom": "~1.8.0",
     "progress-bar": "~0.1.1",
+    "sanitize-filename": "^1.6.1",
     "ytdl-core": ">=0.10.0"
   },
   "devDependencies": {
