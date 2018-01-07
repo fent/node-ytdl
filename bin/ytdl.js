@@ -1,106 +1,41 @@
 #!/usr/bin/env node
 
+var url;
 const info = require('../package');
-const opts = require('nomnom')
-  .option('version', {
-    abbr: 'v',
-    flag: true,
-    callback: () => {
-      console.log(info.version);
-      process.exit();
-    },
-    help: 'Print program version.'
-  })
-  .option('url', {
-    position: 0,
-    required: true,
-    help: 'URL to the video.'
-  })
-  .option('quality', {
-    abbr: 'q',
-    metavar: 'ITAG',
-    help: 'Video quality to download, default: highest'
-  })
-  .option('range', {
-    abbr: 'r',
-    metavar: 'INT-INT',
-    help: 'Byte range to download, ie 10355705-12452856'
-  })
-  .option('begin', {
-    abbr: 'b',
-    metavar: 'INT',
-    help: 'Time to begin video, format by 1:30.123 and 1m30s'
-  })
-  .option('output', {
-    abbr: 'o',
-    metavar: 'FILE',
-    help: 'Save to file, template by {prop}, default: stdout'
-  })
-  .option('filter', {
-    full: 'filter',
-    metavar: 'STR',
-    help: 'Can be video, videoonly, audio, audioonly'
-  })
-  .option('filterContainer', {
-    full: 'filter-container',
-    metavar: 'REGEXP',
-    help: 'Filter in format container'
-  })
-  .option('unfilterContainer', {
-    full: 'unfilter-container',
-    metavar: 'REGEXP',
-    help: 'Filter out format container'
-  })
-  .option('filterResolution', {
-    full: 'filter-resolution',
-    metavar: 'REGEXP',
-    help: 'Filter in format resolution'
-  })
-  .option('unfilterResolution', {
-    full: 'unfilter-resolution',
-    metavar: 'REGEXP',
-    help: 'Filter out format resolution'
-  })
-  .option('filterEncoding', {
-    full: 'filter-encoding',
-    metavar: 'REGEXP',
-    help: 'Filter in format encoding'
-  })
-  .option('unfilterEncoding', {
-    full: 'unfilter-encoding',
-    metavar: 'REGEXP',
-    help: 'Filter out format encoding'
-  })
-  .option('info', {
-    abbr: 'i',
-    flag: true,
-    help: 'Print video info without downloading'
-  })
-  .option('infoJson', {
-    full: 'info-json',
-    abbr: 'j',
-    flag: true,
-    help: 'Print video info as JSON without downloading'
-  })
-  .option('printUrl', {
-    full: 'print-url',
-    flag: true,
-    help: 'Print direct download URL'
-  })
-  .option('noCache', {
-    full: 'no-cache',
-    flat: true,
-    help: 'Skip file cache for html5player'
-  })
-  .option('debug', {
-    flag: true,
-    help: 'Print debug information'
-  })
-  .script('ytdl')
-  .colors()
-  .parse()
+const chalk = require('chalk');
+const opts = require('commander')
+  .version(info.version)
+  .arguments('<url>')
+  .action((a) => { url = a; })
+  .option('-q, --quality <ITAG>',
+    'Video quality to download, default: highest')
+  .option('-r, --range <INT>..<INT>',
+    'Byte range to download, ie 10355705-12452856')
+  .option('-b, --begin <INT>', 'Time to begin video, format by 1:30.123 and 1m30s')
+  .option('-o, --output <FILE>', 'Save to file, template by {prop}, default: stdout')
+  .option('--filter <STR>',
+    'Can be video, videoonly, audio, audioonly',
+    /^(video|audio)(only)?$/)
+  .option('--filter-container <REGEXP>', 'Filter in format container')
+  .option('--unfilter-container <REGEXP>', 'Filter out format container')
+  .option('--filter-resolution <REGEXP>', 'Filter in format resolution')
+  .option('--unfilter-resolution <REGEXP>', 'Filter out format resolution')
+  .option('--filter-encoding <REGEXP>', 'Filter in format encoding')
+  .option('--unfilter-encoding <REGEXP>', 'Filter out format encoding')
+  .option('-i, --info', 'Print video info without downloading')
+  .option('-j, --info-json', 'Print video info as JSON without downloading')
+  .option('--print-url', 'Print direct download URL')
+  .option('--no-cache', 'Skip file cache for html5player')
+  .option('--debug', 'Print debug information')
+  .parse(process.argv)
   ;
 
+if (!url) {
+  opts.outputHelp((help) => {
+    return chalk.red('\n  url argument is required\n') + help;
+  });
+  process.exit(1);
+}
 
 const path         = require('path');
 const fs           = require('fs');
@@ -109,7 +44,6 @@ const homedir      = require('homedir');
 const util         = require('../lib/util');
 const sanitizeName = require('sanitize-filename');
 
-const chalk = require('chalk');
 const label = chalk.bold.gray;
 
 
@@ -150,7 +84,7 @@ function printVideoInfo(info) {
 }
 
 if (opts.infoJson) {
-  ytdl.getInfo(opts.url, { debug: opts.debug }, (err, info) => {
+  ytdl.getInfo(url, { debug: opts.debug }, (err, info) => {
     if (err) {
       console.error(err.message);
       process.exit(1);
@@ -160,7 +94,7 @@ if (opts.infoJson) {
   });
 } else if (opts.info) {
   const cliff = require('cliff');
-  ytdl.getInfo(opts.url, { debug: opts.debug }, (err, info) => {
+  ytdl.getInfo(url, { debug: opts.debug }, (err, info) => {
     if (err) {
       console.error(err.message);
       process.exit(1);
@@ -265,7 +199,7 @@ if (opts.infoJson) {
   };
 
   if (opts.printUrl) {
-    ytdl.getInfo(opts.url, { debug: opts.debug }, (err, info) => {
+    ytdl.getInfo(url, { debug: opts.debug }, (err, info) => {
       if (err) {
         console.error(err.message);
         process.exit(1);
@@ -281,7 +215,7 @@ if (opts.infoJson) {
     });
 
   } else {
-    var readStream = ytdl(opts.url, ytdlOptions);
+    var readStream = ytdl(url, ytdlOptions);
     var liveBroadcast = false;
 
     readStream.on('info', (info, format) => {

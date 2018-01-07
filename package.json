@@ -31,9 +31,9 @@
   "dependencies": {
     "chalk": "^2.0.0",
     "cliff": "~0.1.8",
+    "commander": "^2.12.2",
     "homedir": "^0.6.0",
     "lodash.throttle": "^4.1.1",
-    "nomnom": "~1.8.0",
     "progress-bar": "~0.1.1",
     "sanitize-filename": "^1.6.1",
     "ytdl-core": "^0.18.4"
