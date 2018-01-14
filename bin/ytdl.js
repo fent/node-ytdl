@@ -283,6 +283,7 @@ if (opts.infoJson) {
   } else {
     var readStream = ytdl(opts.url, ytdlOptions);
     var liveBroadcast = false;
+    var is_stdout_mutable = (process.stdout && process.stdout.cursorTo && process.stdout.clearLine);
 
     readStream.on('info', (info, format) => {
       if (!output) {
@@ -332,7 +333,9 @@ if (opts.infoJson) {
 
       readStream.on('data', (data) => {
         dataRead += data.length;
-        updateProgress();
+        if (is_stdout_mutable) {
+          updateProgress();
+        }
       });
     });
 
@@ -366,10 +369,16 @@ if (opts.infoJson) {
       var dataRead = 0;
       readStream.on('data', (data) => {
         dataRead += data.length;
-        if (dataRead === size) {
-          updateBar();
-        } else {
-          updateBarThrottled();
+
+        if (is_stdout_mutable) {
+          if (dataRead === size) {
+            updateBar();
+          } else {
+            updateBarThrottled();
+          }
+        }
+        else if (dataRead === size) {
+          console.log(`download complete: ${size} bytes of data read`)
         }
       });
     });
