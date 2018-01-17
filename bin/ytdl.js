@@ -283,7 +283,7 @@ if (opts.infoJson) {
   } else {
     var readStream = ytdl(opts.url, ytdlOptions);
     var liveBroadcast = false;
-    var is_stdout_mutable = (process.stdout && process.stdout.cursorTo && process.stdout.clearLine);
+    var stdoutMutable = process.stdout && process.stdout.cursorTo && process.stdout.clearLine;
 
     readStream.on('info', (info, format) => {
       if (!output) {
@@ -333,10 +333,17 @@ if (opts.infoJson) {
 
       readStream.on('data', (data) => {
         dataRead += data.length;
-        if (is_stdout_mutable) {
+        if (stdoutMutable) {
           updateProgress();
         }
       });
+
+      readStream.on('end', () => {
+        if (stdoutMutable) {
+          console.log(label('downloaded: ') + util.toHumanSize(dataRead));
+        }
+        console.log();
+      })
     });
 
     readStream.on('response', (res) => {
@@ -348,6 +355,7 @@ if (opts.infoJson) {
                   ' (' + size +' bytes)');
       console.log(label('output: ') + output);
       console.log();
+      if (!stdoutMutable) { return; }
 
       // Create progress bar.
       const bar = require('progress-bar').create(process.stdout, 50);
@@ -369,27 +377,21 @@ if (opts.infoJson) {
       var dataRead = 0;
       readStream.on('data', (data) => {
         dataRead += data.length;
+        if (dataRead === size) {
+          updateBar();
+        } else {
+          updateBarThrottled();
+        }
+      });
 
-        if (is_stdout_mutable) {
-          if (dataRead === size) {
-            updateBar();
-          } else {
-            updateBarThrottled();
-          }
-        }
-        else if (dataRead === size) {
-          console.log(`download complete: ${size} bytes of data read`)
-        }
+      readStream.on('end', () => {
+        console.log();
       });
     });
 
     readStream.on('error', (err) => {
       console.error(err.message);
       process.exit(1);
-    });
-
-    readStream.on('end', () => {
-      console.log();
     });
 
     process.on('SIGINT', () => {
