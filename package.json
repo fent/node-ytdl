@@ -36,7 +36,7 @@
     "lodash.throttle": "^4.1.1",
     "progress-bar": "~0.1.1",
     "sanitize-filename": "^1.6.1",
-    "ytdl-core": "^0.18.4"
+    "ytdl-core": "^0.18.7"
   },
   "devDependencies": {
     "istanbul": "^0.4.5",
