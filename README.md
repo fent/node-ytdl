@@ -9,13 +9,6 @@ A youtube downloader written in Javascript. To be used with the command line. If
 # Usage
 
 
-Download video and convert to mp3 (Requires ffmpeg)
-
-```bash
- name=`echo myfilename` && ytdl http://www.youtube.com/watch?v=_HSylqgVYQI > $name.mp4 && ffmpeg -i $name.mp4 -b:a 192K -vn $name.mp3 && rm -rf $name.mp4
-
-```
-
 
 Streams to stdout by default
 
@@ -28,6 +21,20 @@ To save to a file
 or
 
     ytdl -o "{author.name} - {title}" http://www.youtube.com/watch?v=_HSylqgVYQI
+
+
+Download video and convert to mp3 (Requires ffmpeg)
+
+```bash
+name=`echo myfilename` && ytdl https://www.youtube.com/watch?v=_HSylqgVYQI > $name.mp4 && ffmpeg -i $name.mp4 -b:a 192K -vn $name.mp3
+```
+
+Download video pipe directly intp ffmpeg if you only want the .mp3 file (Requires ffmpeg)
+
+```bash
+name=`echo myfilename` && ytdl http://www.youtube.com/watch?v=_HSylqgVYQI | ffmpeg -i pipe:0 -b:a 192K -vn $name.mp3
+```
+
 
 Supported options
 
