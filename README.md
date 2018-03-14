@@ -73,3 +73,9 @@ Tests are written with [mocha](https://mochajs.org)
 ```bash
 npm test
 ```
+
+# Contributors
+
+Fent ([@fent](https://github.com/fent))
+------------------
+* Jesse Spencer ([@Jspenc72](https://github.com/jspenc72))
