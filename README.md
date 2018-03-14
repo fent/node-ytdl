@@ -12,7 +12,8 @@ A youtube downloader written in Javascript. To be used with the command line. If
 Download video and convert to mp3 (Requires ffmpeg)
 
 ```bash
-ytdl http://www.youtube.com/watch?v=_HSylqgVYQI > myvideo.mp4 && ffmpeg -i myvideo.mp4 -b:a 192K -vn music.mp3
+ name=`echo myfilename` && ytdl http://www.youtube.com/watch?v=_HSylqgVYQI > $name.mp4 && ffmpeg -i $name.mp4 -b:a 192K -vn $name.mp3 && rm -rf $name.mp4
+
 ```
 
 
