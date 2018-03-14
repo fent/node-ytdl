@@ -8,6 +8,14 @@ A youtube downloader written in Javascript. To be used with the command line. If
 
 # Usage
 
+
+Download video and convert to mp3 (Requires ffmpeg)
+
+```bash
+ytdl http://www.youtube.com/watch?v=_HSylqgVYQI > myvideo.mp4 && ffmpeg -i myvideo.mp4 -b:a 192K -vn music.mp3
+```
+
+
 Streams to stdout by default
 
     ytdl http://www.youtube.com/watch?v=_HSylqgVYQI | mpv -
