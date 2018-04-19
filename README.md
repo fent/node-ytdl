@@ -8,8 +8,6 @@ A youtube downloader written in Javascript. To be used with the command line. If
 
 # Usage
 
-
-
 Streams to stdout by default
 
     ytdl http://www.youtube.com/watch?v=_HSylqgVYQI | mpv -
@@ -26,13 +24,7 @@ or
 Download video and convert to mp3 (Requires ffmpeg)
 
 ```bash
-name=`echo myfilename` && ytdl https://www.youtube.com/watch?v=_HSylqgVYQI > $name.mp4 && ffmpeg -i $name.mp4 -b:a 192K -vn $name.mp3
-```
-
-Download video pipe directly intp ffmpeg if you only want the .mp3 file (Requires ffmpeg)
-
-```bash
-name=`echo myfilename` && ytdl http://www.youtube.com/watch?v=_HSylqgVYQI | ffmpeg -i pipe:0 -b:a 192K -vn $name.mp3
+ytdl http://www.youtube.com/watch?v=_HSylqgVYQI | ffmpeg -i pipe:0 -b:a 192K -vn myfile.mp3
 ```
 
 
@@ -73,9 +65,3 @@ Tests are written with [mocha](https://mochajs.org)
 ```bash
 npm test
 ```
-
-# Contributors
-
-Fent ([@fent](https://github.com/fent))
-------------------
-* Jesse Spencer ([@Jspenc72](https://github.com/jspenc72))
