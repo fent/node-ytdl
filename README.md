@@ -20,6 +20,14 @@ or
 
     ytdl -o "{author.name} - {title}" "http://www.youtube.com/watch?v=_HSylqgVYQI"
 
+
+Download video and convert to mp3 (Requires ffmpeg)
+
+```bash
+ytdl http://www.youtube.com/watch?v=_HSylqgVYQI | ffmpeg -i pipe:0 -b:a 192K -vn myfile.mp3
+```
+
+
 Supported options
 
     Usage: ytdl <url> [options]
