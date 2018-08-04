@@ -21,14 +21,14 @@ describe('util.toHumanSize()', () => {
 describe('util.tmpl()', () => {
   describe('With one match', () => {
     it('Returns a templated string', () => {
-      var rs = util.tmpl('hello {title}', [{ title: 'world' }]);
+      let rs = util.tmpl('hello {title}', [{ title: 'world' }]);
       assert.equal(rs, 'hello world');
     });
   });
 
   describe('With several matches', () => {
     it('Returns a templated string', () => {
-      var rs = util.tmpl('The {biganimal} jumped over the {smallanimal}', [{
+      let rs = util.tmpl('The {biganimal} jumped over the {smallanimal}', [{
         biganimal: 'dog',
         smallanimal: 'frog',
       }]);
@@ -38,7 +38,7 @@ describe('util.tmpl()', () => {
 
   describe('Referencing a nested property with dot (.)', () => {
     it('Returns a templated string', () => {
-      var rs = util.tmpl('Package is {mypkg.name} {pkg.version.str}', [{
+      let rs = util.tmpl('Package is {mypkg.name} {pkg.version.str}', [{
         mypkg: { name: 'ytdl' },
         pkg: { version: { str: 'v0.4.2' } },
         something: { else: 'hey' },
@@ -49,7 +49,7 @@ describe('util.tmpl()', () => {
 
   describe('With several context objects', () => {
     it('Returns a templated string', () => {
-      var rs = util.tmpl('Video is {title}.{container}', [
+      let rs = util.tmpl('Video is {title}.{container}', [
         { title: 'super mario' },
         { container: 'mp4' },
       ]);
@@ -59,7 +59,7 @@ describe('util.tmpl()', () => {
 
   describe('With no match', () => {
     it('Returns a templated string', () => {
-      var rs = util.tmpl('My name is {name}', [{ what:'nothing here' }]);
+      let rs = util.tmpl('My name is {name}', [{ what:'nothing here' }]);
       assert.equal(rs, 'My name is {name}');
     });
   });

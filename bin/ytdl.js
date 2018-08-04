@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-var url;
+let url;
 const info = require('../package');
 const chalk = require('chalk');
 const opts = require('commander')
@@ -49,8 +49,8 @@ const label = chalk.bold.gray;
 
 if (opts.cache !== false) {
   // Keep cache in file.
-  var cachefile = path.resolve(homedir(), '.ytdl-cache.json');
-  var cache = {};
+  const cachefile = path.resolve(homedir(), '.ytdl-cache.json');
+  let cache = {};
   fs.readFile(cachefile, (err, contents) => {
     if (err) return;
     try {
@@ -103,7 +103,7 @@ if (opts.infoJson) {
 
     printVideoInfo(info);
 
-    var cols = [
+    const cols = [
       'itag',
       'container',
       'resolution',
@@ -120,13 +120,13 @@ if (opts.infoJson) {
       });
     });
     console.log(label('formats:'));
-    var colors = ['green', 'blue', 'green', 'blue', 'green', 'blue'];
+    const colors = ['green', 'blue', 'green', 'blue', 'green', 'blue'];
     console.log(cliff.stringifyObjectRows(info.formats, cols, colors));
   });
 
 } else {
-  var output = opts.output;
-  var ext = (output || '').match(/(\.\w+)?$/)[1];
+  let output = opts.output;
+  let ext = (output || '').match(/(\.\w+)?$/)[1];
 
   if (output) {
     if (ext && !opts.quality && !opts.filterContainer) {
@@ -134,26 +134,27 @@ if (opts.infoJson) {
     }
   }
 
-  var ytdlOptions = {};
+  const ytdlOptions = {};
   ytdlOptions.quality = /,/.test(opts.quality) ?
     opts.quality.split(',') : opts.quality;
   if (opts.range) {
-    var s = opts.range.split('-');
+    let s = opts.range.split('-');
     ytdlOptions.range = { start: s[0], end: s[1] };
   }
   ytdlOptions.begin = opts.begin;
 
   // Create filters.
-  var filters = [];
+  const filters = [];
 
   /**
    * @param {String} field
    * @param {String} regexpStr
    * @param {Boolean|null} negated
    */
-  var createFilter = (field, regexpStr, negated) => {
+  const createFilter = (field, regexpStr, negated) => {
+    let regexp;
     try {
-      var regexp = new RegExp(regexpStr, 'i');
+      regexp = new RegExp(regexpStr, 'i');
     } catch (err) {
       console.error(err.message);
       process.exit(1);
@@ -163,7 +164,7 @@ if (opts.infoJson) {
   };
 
   ['container', 'resolution', 'encoding'].forEach((field) => {
-    var key = 'filter' + field[0].toUpperCase() + field.slice(1);
+    let key = 'filter' + field[0].toUpperCase() + field.slice(1);
     if (opts[key]) {
       createFilter(field, opts[key], false);
     }
@@ -205,7 +206,7 @@ if (opts.infoJson) {
         process.exit(1);
         return;
       }
-      var format = ytdl.chooseFormat(info.formats, ytdlOptions);
+      let format = ytdl.chooseFormat(info.formats, ytdlOptions);
       if (format instanceof Error) {
         console.error(format.message);
         process.exit(1);
@@ -215,9 +216,9 @@ if (opts.infoJson) {
     });
 
   } else {
-    var readStream = ytdl(url, ytdlOptions);
-    var liveBroadcast = false;
-    var stdoutMutable = process.stdout && process.stdout.cursorTo && process.stdout.clearLine;
+    const readStream = ytdl(url, ytdlOptions);
+    const stdoutMutable = process.stdout && process.stdout.cursorTo && process.stdout.clearLine;
+    let liveBroadcast = false;
 
     readStream.on('info', (info, format) => {
       if (!output) {
@@ -234,7 +235,7 @@ if (opts.infoJson) {
       }
 
       // Parses & sanitises output filename for any illegal characters
-      var parsedOutput = path.parse(output);
+      let parsedOutput = path.parse(output);
       output = path.format({
         dir: parsedOutput.dir,
         base: sanitizeName(parsedOutput.base)
@@ -257,8 +258,8 @@ if (opts.infoJson) {
       if (!liveBroadcast) { return; }
 
       const throttle = require('lodash.throttle');
-      var dataRead = 0;
-      var updateProgress = throttle(() => {
+      let dataRead = 0;
+      const updateProgress = throttle(() => {
         process.stdout.cursorTo(0);
         process.stdout.clearLine(1);
         process.stdout.write(label('size: ') + util.toHumanSize(dataRead) +
@@ -277,14 +278,14 @@ if (opts.infoJson) {
           console.log(label('downloaded: ') + util.toHumanSize(dataRead));
         }
         console.log();
-      })
+      });
     });
 
     readStream.on('response', (res) => {
       if (!output || liveBroadcast) { return; }
 
       // Print information about the format we're downloading.
-      var size = parseInt(res.headers['content-length'], 10);
+      const size = parseInt(res.headers['content-length'], 10);
       console.log(label('size: ') + util.toHumanSize(size) +
                   ' (' + size +' bytes)');
       console.log(label('output: ') + output);
@@ -296,19 +297,19 @@ if (opts.infoJson) {
       const throttle = require('lodash.throttle');
       bar.format = '$bar; $percentage;%';
 
-      var lastPercent = null;
-      var updateBar = () => {
-        var percent = dataRead / size;
-        var newPercent = Math.floor(percent * 100);
+      let lastPercent = null;
+      let updateBar = () => {
+        let percent = dataRead / size;
+        let newPercent = Math.floor(percent * 100);
         if (newPercent != lastPercent) {
           lastPercent = newPercent;
           bar.update(percent);
         }
       };
-      var updateBarThrottled = throttle(updateBar, 100, { trailing: false });
+      let updateBarThrottled = throttle(updateBar, 100, { trailing: false });
 
       // Keep track of progress.
-      var dataRead = 0;
+      let dataRead = 0;
       readStream.on('data', (data) => {
         dataRead += data.length;
         if (dataRead === size) {
