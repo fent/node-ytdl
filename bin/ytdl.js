@@ -60,8 +60,8 @@ if (opts.cache !== false) {
     }
   });
 
-  ytdl.cache.get = key => cache[key];
-  ytdl.cache.set = (key, value) => {
+  ytdl.cache.sig.get = key => cache[key];
+  ytdl.cache.sig.set = (key, value) => {
     cache[key] = value;
     fs.writeFile(cachefile,
       JSON.stringify(cache, null, 2), () => {});
