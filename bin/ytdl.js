@@ -47,6 +47,7 @@ const sanitizeName = require('sanitize-filename');
 const label = chalk.bold.gray;
 
 
+ytdl.cache.info.timeout = 0;
 if (opts.cache !== false) {
   // Keep cache in file.
   const cachefile = path.resolve(homedir(), '.ytdl-cache.json');
