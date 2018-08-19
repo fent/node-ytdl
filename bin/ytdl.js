@@ -74,14 +74,17 @@ if (opts.cache !== false) {
  * Prints basic video information.
  *
  * @param {Object} info
+ * @param {Boolean} live
  */
-function printVideoInfo(info) {
+function printVideoInfo(info, live) {
   console.log();
   console.log(label('title: ') + info.title);
   console.log(label('author: ') + info.author.name);
   console.log(label('average rating: ') + info.avg_rating);
   console.log(label('view count: ') + info.view_count);
-  console.log(label('length: ') + util.toHumanTime(info.length_seconds));
+  if (!live) {
+    console.log(label('length: ') + util.toHumanTime(info.length_seconds));
+  }
 }
 
 if (opts.infoJson) {
@@ -102,7 +105,7 @@ if (opts.infoJson) {
       return;
     }
 
-    printVideoInfo(info);
+    printVideoInfo(info, info.formats.some(f => f.live));
 
     const cols = [
       'itag',
@@ -248,14 +251,14 @@ if (opts.infoJson) {
           process.exit(1);
         });
 
+      liveBroadcast = format.live;
+
       // Print information about the video if not streaming to stdout.
-      printVideoInfo(info);
+      printVideoInfo(info, liveBroadcast);
 
       console.log(label('container: ') + format.container);
       console.log(label('resolution: ') + format.resolution);
       console.log(label('encoding: ') + format.encoding);
-
-      liveBroadcast = format.live;
       if (!liveBroadcast) { return; }
 
       const throttle = require('lodash.throttle');
