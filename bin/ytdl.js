@@ -74,9 +74,9 @@ if (opts.cache !== false) {
  * Prints basic video information.
  *
  * @param {Object} info
- * @param {Boolean} live
+ * @param {boolean} live
  */
-function printVideoInfo(info, live) {
+const printVideoInfo = (info, live) => {
   console.log();
   console.log(label('title: ') + info.title);
   console.log(label('author: ') + info.author.name);
@@ -85,7 +85,7 @@ function printVideoInfo(info, live) {
   if (!live) {
     console.log(label('length: ') + util.toHumanTime(info.length_seconds));
   }
-}
+};
 
 if (opts.infoJson) {
   ytdl.getInfo(url, { debug: opts.debug }, (err, info) => {
@@ -151,9 +151,9 @@ if (opts.infoJson) {
   const filters = [];
 
   /**
-   * @param {String} field
-   * @param {String} regexpStr
-   * @param {Boolean|null} negated
+   * @param {string} field
+   * @param {string} regexpStr
+   * @param {boolean|null} negated
    */
   const createFilter = (field, regexpStr, negated) => {
     let regexp;
