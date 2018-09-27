@@ -222,7 +222,7 @@ if (opts.infoJson) {
   } else {
     const readStream = ytdl(url, ytdlOptions);
     const stdoutMutable = process.stdout && process.stdout.cursorTo && process.stdout.clearLine;
-    let liveBroadcast = false;
+    let isPlaylist = false;
 
     readStream.on('info', (info, format) => {
       if (!output) {
@@ -251,23 +251,26 @@ if (opts.infoJson) {
           process.exit(1);
         });
 
-      liveBroadcast = format.live;
+      isPlaylist = format.live || format.isHLS || format.isDashMPD;
 
       // Print information about the video if not streaming to stdout.
-      printVideoInfo(info, liveBroadcast);
+      printVideoInfo(info, isPlaylist);
 
       console.log(label('container: ') + format.container);
       console.log(label('resolution: ') + format.resolution);
       console.log(label('encoding: ') + format.encoding);
-      if (!liveBroadcast) { return; }
+      if (!isPlaylist) { return; }
 
       const throttle = require('lodash.throttle');
       let dataRead = 0;
       const updateProgress = throttle(() => {
         process.stdout.cursorTo(0);
         process.stdout.clearLine(1);
-        process.stdout.write(label('size: ') + util.toHumanSize(dataRead) +
-                             ' (' + dataRead +' bytes)');
+        let line = label('size: ') + util.toHumanSize(dataRead);
+        if (dataRead >= 1024) {
+          line += ` (${dataRead} bytes)`;
+        }
+        process.stdout.write(line);
       }, 500);
 
       readStream.on('data', (data) => {
@@ -279,14 +282,16 @@ if (opts.infoJson) {
 
       readStream.on('end', () => {
         if (stdoutMutable) {
-          console.log(label('downloaded: ') + util.toHumanSize(dataRead));
+          updateProgress.flush();
+          console.log();
+        } else {
+          console.log('\n' + label('downloaded: ') + util.toHumanSize(dataRead));
         }
-        console.log();
       });
     });
 
     readStream.on('response', (res) => {
-      if (!output || liveBroadcast) { return; }
+      if (!output || isPlaylist) { return; }
 
       // Print information about the format we're downloading.
       const size = parseInt(res.headers['content-length'], 10);
