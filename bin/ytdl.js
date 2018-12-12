@@ -81,7 +81,8 @@ const printVideoInfo = (info, live) => {
   console.log(label('title: ') + info.title);
   console.log(label('author: ') + info.author.name);
   console.log(label('average rating: ') + info.avg_rating);
-  console.log(label('view count: ') + info.view_count);
+  console.log(label('view count: ') +
+    info.player_response.videoDetails.viewCount);
   if (!live) {
     console.log(label('length: ') + util.toHumanTime(info.length_seconds));
   }
