@@ -12,7 +12,7 @@ const opts = require('commander')
   .option('-r, --range <INT>..<INT>',
     'Byte range to download, ie 10355705-12452856')
   .option('-b, --begin <INT>', 'Time to begin video, format by 1:30.123 and 1m30s')
-  .option('-o, --output <FILE>', 'Save to file, template by {prop}, default: stdout')
+  .option('-o, --output <FILE>', 'Save to file, template by {prop}, default: stdout or {title}')
   .option('--filter <STR>',
     'Can be video, videoonly, audio, audioonly',
     /^(video|audio)(only)?$/)
@@ -137,6 +137,8 @@ if (opts.infoJson) {
     if (ext && !opts.quality && !opts.filterContainer) {
       opts.filterContainer = '^' + ext.slice(1) + '$';
     }
+  } else if (process.stdout.isTTY) {
+    output = '{title}';
   }
 
   const ytdlOptions = {};
