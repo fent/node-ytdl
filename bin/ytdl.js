@@ -42,7 +42,6 @@ const fs           = require('fs');
 const ytdl         = require('ytdl-core');
 const homedir      = require('homedir');
 const util         = require('../lib/util');
-const sanitizeName = require('sanitize-filename');
 
 const label = chalk.bold.gray;
 
@@ -246,9 +245,11 @@ if (opts.infoJson) {
       let parsedOutput = path.parse(output);
       output = path.format({
         dir: parsedOutput.dir,
-        base: sanitizeName(parsedOutput.base, { replacement: '-' })
+        base: parsedOutput.base,
       });
 
+      console.log('base', parsedOutput.base);
+      console.log('output', output);
       readStream.pipe(fs.createWriteStream(output))
         .on('error', (err) => {
           console.error(err.message);
