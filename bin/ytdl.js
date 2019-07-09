@@ -294,7 +294,7 @@ if (opts.infoJson) {
       });
     });
 
-    readStream.on('response', (res) => {
+    readStream.once('response', (res) => {
       if (!output || isPlaylist) { return; }
 
       // Print information about the format we're downloading.
