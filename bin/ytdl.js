@@ -246,7 +246,7 @@ if (opts.infoJson) {
       let parsedOutput = path.parse(output);
       output = path.format({
         dir: parsedOutput.dir,
-        base: sanitizeName(parsedOutput.base)
+        base: sanitizeName(parsedOutput.base, { replacement: '-' })
       });
 
       readStream.pipe(fs.createWriteStream(output))
