@@ -29,7 +29,7 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "chalk": "^2.0.0",
+    "chalk": "^3.0.0",
     "cliff": "~0.1.8",
     "commander": "^3.0.0",
     "homedir": "^0.6.0",
