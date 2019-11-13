@@ -31,7 +31,7 @@
   "dependencies": {
     "chalk": "^3.0.0",
     "cliff": "~0.1.8",
-    "commander": "^3.0.0",
+    "commander": "^4.0.1",
     "homedir": "^0.6.0",
     "lodash.throttle": "^4.1.1",
     "progress-bar": "~0.1.1",
