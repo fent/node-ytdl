@@ -20,8 +20,8 @@ const opts = require('commander')
   .option('--unfilter-container <REGEXP>', 'Filter out format container')
   .option('--filter-resolution <REGEXP>', 'Filter in format resolution')
   .option('--unfilter-resolution <REGEXP>', 'Filter out format resolution')
-  .option('--filter-encoding <REGEXP>', 'Filter in format encoding')
-  .option('--unfilter-encoding <REGEXP>', 'Filter out format encoding')
+  .option('--filter-codecs <REGEXP>', 'Filter in format codecs')
+  .option('--unfilter-codecs <REGEXP>', 'Filter out format codecs')
   .option('-i, --info', 'Print video info without downloading')
   .option('-j, --info-json', 'Print video info as JSON without downloading')
   .option('--print-url', 'Print direct download URL')
@@ -111,15 +111,17 @@ if (opts.infoJson) {
     const cols = [
       'itag',
       'container',
-      'resolution',
-      'video enc',
-      'audio bitrate',
-      'audio enc'
+      'quality',
+      'codecs',
+      'bitrate',
+      'audio bitrate'
     ];
     info.formats.forEach((format) => {
-      format['video enc']     = format.encoding;
-      format['audio bitrate'] = format.audioBitrate;
-      format['audio enc']     = format.audioEncoding;
+      format['quality'] = format.qualityLabel;
+      format['bitrate'] = format.qualityLabel ?
+        util.toHumanSize(format.bitrate) : null;
+      format['audio bitrate'] = format.audioBitrate ?
+        format.audioBitrate + 'KB' : null;
       cols.forEach((col) => {
         format[col] = format[col] || '';
       });
@@ -170,15 +172,16 @@ if (opts.infoJson) {
     filters.push(format => negated !== regexp.test(format[field]));
   };
 
-  ['container', 'resolution', 'encoding'].forEach((field) => {
-    let key = 'filter' + field[0].toUpperCase() + field.slice(1);
-    if (opts[key]) {
-      createFilter(field, opts[key], false);
+  ['container', 'resolution:qualityLabel', 'encoding'].forEach((field) => {
+    let [fieldName, fieldKey] = field.split(':');
+    let optsKey = 'filter' + fieldName[0].toUpperCase() + fieldName.slice(1);
+    if (opts[optsKey]) {
+      createFilter(fieldKey, opts[optsKey], false);
     }
 
-    key = 'un' + key;
-    if (opts[key]) {
-      createFilter(field, opts[key], true);
+    optsKey = 'un' + optsKey;
+    if (opts[optsKey]) {
+      createFilter(fieldKey, opts[optsKey], true);
     }
   });
 
@@ -248,8 +251,6 @@ if (opts.infoJson) {
         base: parsedOutput.base,
       });
 
-      console.log('base', parsedOutput.base);
-      console.log('output', output);
       readStream.pipe(fs.createWriteStream(output))
         .on('error', (err) => {
           console.error(err.message);
@@ -262,8 +263,8 @@ if (opts.infoJson) {
       printVideoInfo(info, isPlaylist);
 
       console.log(label('container: ') + format.container);
-      console.log(label('resolution: ') + format.resolution);
-      console.log(label('encoding: ') + format.encoding);
+      console.log(label('quality: ') + format.qualityLabel);
+      console.log(label('codecs: ') + format.codecs);
       if (!isPlaylist) { return; }
 
       const throttle = require('lodash.throttle');
