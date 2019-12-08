@@ -265,7 +265,9 @@ if (opts.infoJson) {
       printVideoInfo(info, isPlaylist);
 
       console.log(label('container: ') + format.container);
-      console.log(label('quality: ') + format.qualityLabel);
+      if (format.qualityLabel) {
+        console.log(label('quality: ') + format.qualityLabel);
+      }
       console.log(label('codecs: ') + format.codecs);
       if (!isPlaylist) { return; }
 
