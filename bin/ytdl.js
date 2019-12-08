@@ -267,6 +267,10 @@ if (opts.infoJson) {
       console.log(label('container: ') + format.container);
       if (format.qualityLabel) {
         console.log(label('quality: ') + format.qualityLabel);
+        console.log(label('bitrate: ') + util.toHumanSize(format.bitrate));
+      }
+      if (format.audioBitrate) {
+        console.log(label('audio bitrate: ') + format.audioBitrate + 'KB');
       }
       console.log(label('codecs: ') + format.codecs);
       if (!isPlaylist) { return; }
