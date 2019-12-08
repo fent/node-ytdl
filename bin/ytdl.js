@@ -187,21 +187,23 @@ if (opts.infoJson) {
 
   // Support basic ytdl-core filters manually, so that other
   // cli filters are supported when used together.
+  const hasVideo = format => !!format.qualityLabel;
+  const hasAudio = format => !!format.audioBitrate;
   switch (opts.filter) {
     case 'video':
-      filters.push(format => format.bitrate);
+      filters.push(hasVideo);
       break;
 
     case 'videoonly':
-      filters.push(format => format.bitrate && !format.audioBitrate);
+      filters.push(format => hasVideo(format) && !hasAudio(format));
       break;
 
     case 'audio':
-      filters.push(format => format.audioBitrate);
+      filters.push(hasAudio);
       break;
 
     case 'audioonly':
-      filters.push(format => !format.bitrate && format.audioBitrate);
+      filters.push(format => !hasVideo(format) && hasAudio(format));
       break;
   }
 
