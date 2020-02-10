@@ -230,87 +230,16 @@ if (opts.infoJson) {
   } else {
     const readStream = ytdl(url, ytdlOptions);
     const stdoutMutable = process.stdout && process.stdout.cursorTo && process.stdout.clearLine;
-    let isPlaylist = false;
 
-    readStream.on('info', (info, format) => {
-      if (!output) {
-        readStream.pipe(process.stdout).on('error', (err) => {
-          console.error(err.message);
-          process.exit(1);
-        });
-        return;
-      }
 
-      output = util.tmpl(output, [info, format]);
-      if (!ext && format.container) {
-        output += '.' + format.container;
-      }
-
-      // Parses & sanitises output filename for any illegal characters
-      let parsedOutput = path.parse(output);
-      output = path.format({
-        dir: parsedOutput.dir,
-        base: parsedOutput.base,
-      });
-
-      readStream.pipe(fs.createWriteStream(output))
-        .on('error', (err) => {
-          console.error(err.message);
-          process.exit(1);
-        });
-
-      isPlaylist = format.live || format.isHLS || format.isDashMPD;
-
-      // Print information about the video if not streaming to stdout.
-      printVideoInfo(info, isPlaylist);
-
-      console.log(label('container: ') + format.container);
-      if (format.qualityLabel) {
-        console.log(label('quality: ') + format.qualityLabel);
-        console.log(label('bitrate: ') + util.toHumanSize(format.bitrate));
-      }
-      if (format.audioBitrate) {
-        console.log(label('audio bitrate: ') + format.audioBitrate + 'KB');
-      }
-      console.log(label('codecs: ') + format.codecs);
-      if (!isPlaylist) { return; }
-
-      const throttle = require('lodash.throttle');
-      let dataRead = 0;
-      const updateProgress = throttle(() => {
-        process.stdout.cursorTo(0);
-        process.stdout.clearLine(1);
-        let line = label('size: ') + util.toHumanSize(dataRead);
-        if (dataRead >= 1024) {
-          line += ` (${dataRead} bytes)`;
-        }
-        process.stdout.write(line);
-      }, 500);
-
-      readStream.on('data', (data) => {
-        dataRead += data.length;
-        if (stdoutMutable) {
-          updateProgress();
-        }
-      });
-
-      readStream.on('end', () => {
-        if (stdoutMutable) {
-          updateProgress.flush();
-          console.log();
-        } else {
-          console.log('\n' + label('downloaded: ') + util.toHumanSize(dataRead));
-        }
-      });
-    });
-
-    readStream.once('response', (res) => {
-      if (!output || isPlaylist) { return; }
-
-      // Print information about the format we're downloading.
-      const size = parseInt(res.headers['content-length'], 10);
+    /**
+     * Prints video size with an optional progress bar as it downloads.
+     *
+     * @param {number} size
+     */
+    const printVideoSize = (size) => {
       console.log(label('size: ') + util.toHumanSize(size) +
-                  ' (' + size +' bytes)');
+        ' (' + size +' bytes)');
       console.log(label('output: ') + output);
       console.log();
       if (!stdoutMutable) { return; }
@@ -345,6 +274,105 @@ if (opts.infoJson) {
       readStream.on('end', () => {
         console.log();
       });
+    };
+
+
+    /**
+     * Prints size of a live video, playlist, or video format that does not
+     * have a content size either in its format metadata or its headers.
+     */
+    const printLiveVideoSize = () => {
+      const throttle = require('lodash.throttle');
+      let dataRead = 0;
+      const updateProgress = throttle(() => {
+        process.stdout.cursorTo(0);
+        process.stdout.clearLine(1);
+        let line = label('size: ') + util.toHumanSize(dataRead);
+        if (dataRead >= 1024) {
+          line += ` (${dataRead} bytes)`;
+        }
+        process.stdout.write(line);
+      }, 500);
+
+      readStream.on('data', (data) => {
+        dataRead += data.length;
+        if (stdoutMutable) {
+          updateProgress();
+        }
+      });
+
+      readStream.on('end', () => {
+        if (stdoutMutable) {
+          updateProgress.flush();
+          console.log();
+        } else {
+          console.log('\n' + label('downloaded: ') + util.toHumanSize(dataRead));
+        }
+      });
+    };
+
+    readStream.on('info', (info, format) => {
+      if (!output) {
+        readStream.pipe(process.stdout).on('error', (err) => {
+          console.error(err.message);
+          process.exit(1);
+        });
+        return;
+      }
+
+      output = util.tmpl(output, [info, format]);
+      if (!ext && format.container) {
+        output += '.' + format.container;
+      }
+
+      // Parses & sanitises output filename for any illegal characters
+      let parsedOutput = path.parse(output);
+      output = path.format({
+        dir: parsedOutput.dir,
+        base: parsedOutput.base,
+      });
+
+      readStream.pipe(fs.createWriteStream(output))
+        .on('error', (err) => {
+          console.error(err.message);
+          process.exit(1);
+        });
+
+
+      // Print information about the video if not streaming to stdout.
+      printVideoInfo(info, format.live);
+
+      console.log(label('container: ') + format.container);
+      if (format.qualityLabel) {
+        console.log(label('quality: ') + format.qualityLabel);
+        console.log(label('bitrate: ') + util.toHumanSize(format.bitrate));
+      }
+      if (format.audioBitrate) {
+        console.log(label('audio bitrate: ') + format.audioBitrate + 'KB');
+      }
+      console.log(label('codecs: ') + format.codecs);
+
+      // Print an incremental size if format size is unknown.
+      let sizeUnknown = !format.clen &&
+        (format.live || format.isHLS || format.isDashMPD);
+
+      if (sizeUnknown) {
+        printLiveVideoSize();
+
+      } else if (format.clen) {
+        printVideoSize(parseInt(format.clen, 10));
+
+      }
+    });
+
+    readStream.once('response', (res) => {
+      if (!output) { return; }
+      if (res.headers['content-length']) {
+        const size = parseInt(res.headers['content-length'], 10);
+        printVideoSize(size);
+      } else {
+        printLiveVideoSize();
+      }
     });
 
     readStream.on('error', (err) => {
