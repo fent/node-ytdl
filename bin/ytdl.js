@@ -76,7 +76,6 @@ if (opts.cache !== false) {
  * @param {boolean} live
  */
 const printVideoInfo = (info, live) => {
-  console.log();
   console.log(label('title: ') + info.title);
   console.log(label('author: ') + info.author.name);
   console.log(label('avg rating: ') +
