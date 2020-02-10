@@ -233,14 +233,13 @@ if (opts.infoJson) {
 
 
     /**
-     * Prints video size with an optional progress bar as it downloads.
+     * Prints video size with a progress bar as it downloads.
      *
      * @param {number} size
      */
     const printVideoSize = (size) => {
       console.log(label('size: ') + util.toHumanSize(size) +
         ' (' + size +' bytes)');
-      console.log(label('output: ') + output);
       console.log();
       if (!stdoutMutable) { return; }
 
@@ -351,6 +350,7 @@ if (opts.infoJson) {
         console.log(label('audio bitrate: ') + format.audioBitrate + 'KB');
       }
       console.log(label('codecs: ') + format.codecs);
+      console.log(label('output: ') + output);
 
       // Print an incremental size if format size is unknown.
       let sizeUnknown = !format.clen &&
@@ -358,21 +358,19 @@ if (opts.infoJson) {
 
       if (sizeUnknown) {
         printLiveVideoSize();
-
       } else if (format.clen) {
         printVideoSize(parseInt(format.clen, 10));
-
-      }
-    });
-
-    readStream.once('response', (res) => {
-      if (!output) { return; }
-      if (res.headers['content-length']) {
-        const size = parseInt(res.headers['content-length'], 10);
-        printVideoSize(size);
       } else {
-        printLiveVideoSize();
+        readStream.once('response', (res) => {
+          if (res.headers['content-length']) {
+            const size = parseInt(res.headers['content-length'], 10);
+            printVideoSize(size);
+          } else {
+            printLiveVideoSize();
+          }
+        });
       }
+
     });
 
     readStream.on('error', (err) => {
