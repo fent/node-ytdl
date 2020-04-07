@@ -340,10 +340,12 @@ if (opts.infoJson) {
       // Print information about the video if not streaming to stdout.
       printVideoInfo(info, format.live);
 
+      // Print format information.
+      console.log(label('itag: ') + format.itag);
       console.log(label('container: ') + format.container);
       if (format.qualityLabel) {
         console.log(label('quality: ') + format.qualityLabel);
-        console.log(label('bitrate: ') + util.toHumanSize(format.bitrate));
+        console.log(label('video bitrate: ') + util.toHumanSize(format.bitrate));
       }
       if (format.audioBitrate) {
         console.log(label('audio bitrate: ') + format.audioBitrate + 'KB');
