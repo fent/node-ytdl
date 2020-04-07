@@ -30,11 +30,11 @@
   },
   "dependencies": {
     "chalk": "^3.0.0",
+    "cli-progress": "^3.7.0",
     "cliff": "~0.1.8",
     "commander": "^4.0.1",
     "homedir": "^0.6.0",
     "lodash.throttle": "^4.1.1",
-    "progress-bar": "~0.1.1",
     "sanitize-filename": "^1.6.1",
     "ytdl-core": "^1.0.2"
   },

@@ -243,30 +243,19 @@ if (opts.infoJson) {
       if (!stdoutMutable) { return; }
 
       // Create progress bar.
-      const bar = require('progress-bar').create(process.stdout, 50);
-      const throttle = require('lodash.throttle');
-      bar.format = '$bar; $percentage;%';
-
-      let lastPercent = null;
-      let updateBar = () => {
-        let percent = dataRead / size;
-        let newPercent = Math.floor(percent * 100);
-        if (newPercent != lastPercent) {
-          lastPercent = newPercent;
-          bar.update(percent);
-        }
-      };
-      let updateBarThrottled = throttle(updateBar, 100, { trailing: false });
+      const CliProgress = require('cli-progress');
+      const bar = new CliProgress.SingleBar({
+        format: '{bar} {percentage}%',
+        complete: '#',
+        incomplete: '-',
+        width: 50,
+        total: size,
+      }, CliProgress.Presets.rect);
+      bar.start(size);
 
       // Keep track of progress.
-      let dataRead = 0;
       readStream.on('data', (data) => {
-        dataRead += data.length;
-        if (dataRead === size) {
-          updateBar();
-        } else {
-          updateBarThrottled();
-        }
+        bar.increment(data.length);
       });
 
       readStream.on('end', () => {
