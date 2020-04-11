@@ -23,7 +23,7 @@
     "ytdl": "./bin/ytdl.js"
   },
   "scripts": {
-    "test": "istanbul cover node_modules/.bin/_mocha -- test/*-test.js"
+    "test": "nyc --reporter=lcov --reporter=text-summary mocha -- test/*-test.js"
   },
   "directories": {
     "lib": "./lib"
@@ -40,8 +40,8 @@
     "ytdl-core": "^2.0.1"
   },
   "devDependencies": {
-    "istanbul": "^0.4.5",
-    "mocha": "^6.2.0"
+    "mocha": "^6.2.0",
+    "nyc": "^15.0.1"
   },
   "engines": {
     "node": ">=4"
