@@ -29,7 +29,7 @@
     "lib": "./lib"
   },
   "dependencies": {
-    "chalk": "^3.0.0",
+    "chalk": "^4.0.0",
     "cli-progress": "^3.7.0",
     "cliff": "~0.1.8",
     "commander": "^4.0.1",
