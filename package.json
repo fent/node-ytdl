@@ -44,7 +44,7 @@
     "nyc": "^15.0.1"
   },
   "engines": {
-    "node": ">=4"
+    "node": ">=10"
   },
   "license": "MIT"
 }
