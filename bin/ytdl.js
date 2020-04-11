@@ -244,22 +244,35 @@ if (opts.infoJson) {
 
       // Create progress bar.
       const CliProgress = require('cli-progress');
+      const StreamSpeed = require('streamspeed');
       const bar = new CliProgress.SingleBar({
-        format: '{bar} {percentage}%',
+        format: '{bar} {percentage}% {speed}',
         complete: '#',
         incomplete: '-',
         width: 50,
         total: size,
-      }, CliProgress.Presets.rect);
+      }, CliProgress.Presets.shades_grey);
       bar.start(size);
+      const ss = new StreamSpeed();
+      ss.add(readStream);
 
       // Keep track of progress.
+      const getSpeed = () => ({
+        speed: StreamSpeed.toHuman(ss.getSpeed(), { timeUnit: 's', precision: 3 }),
+      });
       readStream.on('data', (data) => {
-        bar.increment(data.length);
+        bar.increment(data.length, getSpeed());
       });
 
+      // Update speed every second, in case download is rate limited,
+      // which is the case with `audioonly` formats.
+      let iid = setInterval(() => {
+        bar.update(null, getSpeed());
+      }, 1000);
+
       readStream.on('end', () => {
-        console.log();
+        bar.stop();
+        clearInterval(iid);
       });
     };
 
