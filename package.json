@@ -40,7 +40,7 @@
     "ytdl-core": "^2.0.1"
   },
   "devDependencies": {
-    "mocha": "6.2.0",
+    "mocha": "6.2.3",
     "nyc": "15.0.1"
   },
   "engines": {
