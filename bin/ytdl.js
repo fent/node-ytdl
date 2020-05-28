@@ -25,7 +25,6 @@ const opts = require('commander')
   .option('-j, --info-json', 'Print video info as JSON without downloading')
   .option('--print-url', 'Print direct download URL')
   .option('--no-cache', 'Skip file cache for html5player')
-  .option('--debug', 'Print debug information')
   .parse(process.argv)
   ;
 
@@ -76,35 +75,27 @@ if (opts.cache !== false) {
  * @param {boolean} live
  */
 const printVideoInfo = (info, live) => {
-  console.log(label('title: ') + info.title);
-  console.log(label('author: ') + info.author.name);
-  console.log(label('avg rating: ') +
-    info.player_response.videoDetails.averageRating);
-  console.log(label('views: ') +
-    info.player_response.videoDetails.viewCount);
+  console.log(label('title: ') + info.videoDetails.title);
+  console.log(label('author: ') + info.videoDetails.author.name);
+  console.log(label('avg rating: ') + info.videoDetails.averageRating);
+  console.log(label('views: ') + info.videoDetails.viewCount);
   if (!live) {
-    console.log(label('length: ') + util.toHumanTime(info.length_seconds));
+    console.log(label('length: ') + util.toHumanTime(info.videoDetails.lengthSeconds));
   }
 };
 
+const onError = (err) => {
+  console.error(err.message);
+  process.exit(1);
+};
+
 if (opts.infoJson) {
-  ytdl.getInfo(url, { debug: opts.debug }, (err, info) => {
-    if (err) {
-      console.error(err.message);
-      process.exit(1);
-      return;
-    }
+  ytdl.getInfo(url).then((info) => {
     console.log(JSON.stringify(info));
-  });
+  }, onError);
 } else if (opts.info) {
   const ListIt = require('list-it');
-  ytdl.getInfo(url, { debug: opts.debug }, (err, info) => {
-    if (err) {
-      console.error(err.message);
-      process.exit(1);
-      return;
-    }
-
+  ytdl.getInfo(url).then((info) => {
     printVideoInfo(info, info.formats.some(f => f.live));
 
     const formats = info.formats.map((format) => ({
@@ -118,7 +109,7 @@ if (opts.infoJson) {
     console.log(label('formats:'));
     let listit = new ListIt({ headerBold: true, headerColor: 'gray' });
     console.log(listit.d(formats).toString());
-  });
+  }, onError);
 
 } else {
   let output = opts.output;
@@ -129,7 +120,7 @@ if (opts.infoJson) {
       opts.filterContainer = '^' + ext.slice(1) + '$';
     }
   } else if (process.stdout.isTTY) {
-    output = '{title}';
+    output = '{videoDetails.title}';
   }
 
   const ytdlOptions = {};
@@ -201,12 +192,7 @@ if (opts.infoJson) {
   };
 
   if (opts.printUrl) {
-    ytdl.getInfo(url, { debug: opts.debug }, (err, info) => {
-      if (err) {
-        console.error(err.message);
-        process.exit(1);
-        return;
-      }
+    ytdl.getInfo(url).then((info) => {
       let format = ytdl.chooseFormat(info.formats, ytdlOptions);
       if (format instanceof Error) {
         console.error(format.message);
@@ -214,7 +200,7 @@ if (opts.infoJson) {
         return;
       }
       console.log(format.url);
-    });
+    }, onError);
 
   } else {
     const readStream = ytdl(url, ytdlOptions);
