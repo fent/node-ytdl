@@ -2,7 +2,6 @@
 
 let url;
 const info = require('../package');
-const chalk = require('chalk');
 const opts = require('commander')
   .version(info.version)
   .arguments('<url>')
@@ -30,6 +29,7 @@ const opts = require('commander')
   .parse(process.argv)
   ;
 
+const chalk = require('chalk');
 if (!url) {
   opts.outputHelp((help) => {
     return chalk.red('\n  url argument is required\n') + help;
@@ -97,7 +97,7 @@ if (opts.infoJson) {
     console.log(JSON.stringify(info));
   });
 } else if (opts.info) {
-  const cliff = require('cliff');
+  const ListIt = require('list-it');
   ytdl.getInfo(url, { debug: opts.debug }, (err, info) => {
     if (err) {
       console.error(err.message);
@@ -107,27 +107,17 @@ if (opts.infoJson) {
 
     printVideoInfo(info, info.formats.some(f => f.live));
 
-    const cols = [
-      'itag',
-      'container',
-      'quality',
-      'codecs',
-      'bitrate',
-      'audio bitrate'
-    ];
-    info.formats.forEach((format) => {
-      format['quality'] = format.qualityLabel;
-      format['bitrate'] = format.qualityLabel ?
-        util.toHumanSize(format.bitrate) : null;
-      format['audio bitrate'] = format.audioBitrate ?
-        format.audioBitrate + 'KB' : null;
-      cols.forEach((col) => {
-        format[col] = format[col] || '';
-      });
-    });
+    const formats = info.formats.map((format) => ({
+      itag: format.itag,
+      container: format.container,
+      quality: format.qualityLabel || '',
+      codecs: format.codecs,
+      bitrate: format.qualityLabel ? util.toHumanSize(format.bitrate) : '',
+      'audio bitrate': format.audioBitrate ? format.audioBitrate + 'KB' : '',
+    }));
     console.log(label('formats:'));
-    const colors = ['green', 'blue', 'green', 'blue', 'green', 'blue'];
-    console.log(cliff.stringifyObjectRows(info.formats, cols, colors));
+    let listit = new ListIt({ headerBold: true, headerColor: 'gray' });
+    console.log(listit.d(formats).toString());
   });
 
 } else {
