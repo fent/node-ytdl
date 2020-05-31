@@ -35,7 +35,7 @@
     "commander": "^5.0.0",
     "homedir": "^0.6.0",
     "lodash.throttle": "^4.1.1",
-    "sanitize-filename": "^1.6.1",
+    "sanitize-filename": "^1.6.3",
     "streamspeed": "^2.0.0",
     "ytdl-core": "^2.0.1"
   },
