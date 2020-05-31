@@ -32,7 +32,7 @@
     "chalk": "^4.0.0",
     "cli-progress": "^3.7.0",
     "cliff": "~0.1.8",
-    "commander": "^5.0.0",
+    "commander": "^5.1.0",
     "homedir": "^0.6.0",
     "lodash.throttle": "^4.1.1",
     "sanitize-filename": "^1.6.1",
