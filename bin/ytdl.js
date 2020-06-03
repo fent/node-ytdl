@@ -243,7 +243,7 @@ if (opts.infoJson) {
       // Update speed every second, in case download is rate limited,
       // which is the case with `audioonly` formats.
       let iid = setInterval(() => {
-        bar.update(null, getSpeed());
+        bar.increment(0, getSpeed());
       }, 1000);
 
       readStream.on('end', () => {
