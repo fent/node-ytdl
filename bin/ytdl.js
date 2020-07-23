@@ -337,8 +337,8 @@ if (opts.infoJson) {
 
       if (sizeUnknown) {
         printLiveVideoSize();
-      } else if (format.clen) {
-        printVideoSize(parseInt(format.clen, 10));
+      } else if (format.contentLength) {
+        printVideoSize(parseInt(format.contentLength, 10));
       } else {
         readStream.once('response', (res) => {
           if (res.headers['content-length']) {
