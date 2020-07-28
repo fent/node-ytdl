@@ -96,7 +96,7 @@ if (opts.infoJson) {
 } else if (opts.info) {
   const ListIt = require('list-it');
   ytdl.getInfo(url).then((info) => {
-    printVideoInfo(info, info.formats.some(f => f.live));
+    printVideoInfo(info, info.formats.some(f => f.isLive));
 
     const formats = info.formats.map((format) => ({
       itag: format.itag,
@@ -316,7 +316,7 @@ if (opts.infoJson) {
 
 
       // Print information about the video if not streaming to stdout.
-      printVideoInfo(info, format.live);
+      printVideoInfo(info, format.isLive);
 
       // Print format information.
       console.log(label('itag: ') + format.itag);
@@ -333,7 +333,7 @@ if (opts.infoJson) {
 
       // Print an incremental size if format size is unknown.
       let sizeUnknown = !format.clen &&
-        (format.live || format.isHLS || format.isDashMPD);
+        (format.isLive || format.isHLS || format.isDashMPD);
 
       if (sizeUnknown) {
         printLiveVideoSize();
