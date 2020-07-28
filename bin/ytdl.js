@@ -136,11 +136,12 @@ if (opts.infoJson) {
   const filters = [];
 
   /**
+   * @param {string} name
    * @param {string} field
    * @param {string} regexpStr
    * @param {boolean|null} negated
    */
-  const createFilter = (field, regexpStr, negated) => {
+  const createFilter = (name, field, regexpStr, negated) => {
     let regexp;
     try {
       regexp = new RegExp(regexpStr, 'i');
@@ -149,19 +150,22 @@ if (opts.infoJson) {
       process.exit(1);
     }
 
-    filters.push(format => negated !== regexp.test(format[field]));
+    filters.push([name, format => negated !== regexp.test(format[field])]);
   };
 
   ['container', 'resolution:qualityLabel', 'encoding'].forEach((field) => {
     let [fieldName, fieldKey] = field.split(':');
+    fieldKey = fieldKey || fieldName;
     let optsKey = 'filter' + fieldName[0].toUpperCase() + fieldName.slice(1);
+    let value = opts[optsKey];
+    let name = `${fieldName}=${value}`;
     if (opts[optsKey]) {
-      createFilter(fieldKey, opts[optsKey], false);
+      createFilter(name, fieldKey, value, false);
     }
 
     optsKey = 'un' + optsKey;
     if (opts[optsKey]) {
-      createFilter(fieldKey, opts[optsKey], true);
+      createFilter(name, fieldKey, value, true);
     }
   });
 
@@ -171,24 +175,24 @@ if (opts.infoJson) {
   const hasAudio = format => !!format.audioBitrate;
   switch (opts.filter) {
     case 'video':
-      filters.push(hasVideo);
+      filters.push(['video', hasVideo]);
       break;
 
     case 'videoonly':
-      filters.push(format => hasVideo(format) && !hasAudio(format));
+      filters.push(['videoonly', format => hasVideo(format) && !hasAudio(format)]);
       break;
 
     case 'audio':
-      filters.push(hasAudio);
+      filters.push(['audio', hasAudio]);
       break;
 
     case 'audioonly':
-      filters.push(format => !hasVideo(format) && hasAudio(format));
+      filters.push(['audioonly', format => !hasVideo(format) && hasAudio(format)]);
       break;
   }
 
   ytdlOptions.filter = (format) => {
-    return filters.every(filter => filter(format));
+    return filters.every(filter => filter[1](format));
   };
 
   if (opts.printUrl) {
@@ -353,7 +357,11 @@ if (opts.infoJson) {
     });
 
     readStream.on('error', (err) => {
-      console.error(err.message);
+      if (/No such format found/.test(err.message) && filters.length) {
+        console.error(`No videos matching filters: ${filters.map(filter => filter[0]).join(', ')}`);
+      } else {
+        console.error(err.message);
+      }
       process.exit(1);
     });
 
