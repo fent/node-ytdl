@@ -146,8 +146,7 @@ if (opts.infoJson) {
     try {
       regexp = new RegExp(regexpStr, 'i');
     } catch (err) {
-      console.error(err.message);
-      process.exit(1);
+      onError(err);
     }
 
     filters.push([name, format => negated !== regexp.test(format[field])]);
@@ -199,8 +198,7 @@ if (opts.infoJson) {
     ytdl.getInfo(url).then((info) => {
       let format = ytdl.chooseFormat(info.formats, ytdlOptions);
       if (format instanceof Error) {
-        console.error(format.message);
-        process.exit(1);
+        onError(format);
         return;
       }
       console.log(format.url);
@@ -293,10 +291,7 @@ if (opts.infoJson) {
 
     readStream.on('info', (info, format) => {
       if (!output) {
-        readStream.pipe(process.stdout).on('error', (err) => {
-          console.error(err.message);
-          process.exit(1);
-        });
+        readStream.pipe(process.stdout).on('error', onError);
         return;
       }
 
@@ -312,12 +307,7 @@ if (opts.infoJson) {
         base: parsedOutput.base,
       });
 
-      readStream.pipe(fs.createWriteStream(output))
-        .on('error', (err) => {
-          console.error(err.message);
-          process.exit(1);
-        });
-
+      readStream.pipe(fs.createWriteStream(output)).on('error', onError);
 
       // Print information about the video if not streaming to stdout.
       printVideoInfo(info, format.isLive);
