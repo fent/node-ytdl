@@ -105,6 +105,7 @@ if (opts.infoJson) {
       codecs: format.codecs,
       bitrate: format.qualityLabel ? util.toHumanSize(format.bitrate) : '',
       'audio bitrate': format.audioBitrate ? format.audioBitrate + 'KB' : '',
+      size: format.contentLength ? util.toHumanSize(format.contentLength) : '',
     }));
     console.log(label('formats:'));
     let listit = new ListIt({ headerBold: true, headerColor: 'gray' });
