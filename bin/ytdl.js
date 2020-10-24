@@ -215,8 +215,7 @@ if (opts.infoJson) {
      * @param {number} size
      */
     const printVideoSize = (size) => {
-      console.log(label('size: ') + util.toHumanSize(size) +
-        ' (' + size +' bytes)');
+      console.log(label('size: ') + util.toHumanSize(size));
       console.log();
       if (!stdoutMutable) { return; }
 
