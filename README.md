@@ -2,7 +2,7 @@
 
 A youtube downloader written in Javascript. To be used with the command line. If you're looking to use it in your node program, check out [ytdl-core](https://github.com/fent/node-ytdl-core).
 
-[![Dependency Status](https://david-dm.org/fent/node-ytdl.svg)](https://david-dm.org/fent/node-ytdl)
+![Depfu](https://img.shields.io/depfu/fent/node-ytdl)
 [![codecov](https://codecov.io/gh/fent/node-ytdl/branch/master/graph/badge.svg)](https://codecov.io/gh/fent/node-ytdl)
 
 # Usage
