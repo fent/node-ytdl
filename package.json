@@ -33,7 +33,7 @@
     "list-it": "^1.3.3",
     "lodash.throttle": "^4.1.1",
     "sanitize-filename": "^1.6.3",
-    "streamspeed": "^2.0.0",
+    "streamspeed": "^2.0.1",
     "ytdl-core": "^3.3.0"
   },
   "devDependencies": {
