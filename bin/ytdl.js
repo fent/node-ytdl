@@ -44,12 +44,6 @@ const util         = require('../lib/util');
 
 const label = chalk.bold.gray;
 
-
-ytdl.cache.sig.timeout = 0;
-ytdl.cache.info.timeout = 0;
-ytdl.cache.watch.timeout = 0;
-ytdl.cache.cookie.timeout = 0;
-
 if (opts.cache !== false) {
   // Keep cache in file.
   const cachefile = path.resolve(homedir(), '.ytdl-cache.json');
@@ -201,12 +195,7 @@ if (opts.infoJson) {
 
   if (opts.printUrl) {
     ytdl.getInfo(url).then((info) => {
-      let format = ytdl.chooseFormat(info.formats, ytdlOptions);
-      if (format instanceof Error) {
-        onError(format);
-        return;
-      }
-      console.log(format.url);
+      console.log(ytdl.chooseFormat(info.formats, ytdlOptions).url);
     }, onError);
 
   } else {
