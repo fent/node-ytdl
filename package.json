@@ -34,7 +34,7 @@
     "lodash.throttle": "^4.1.1",
     "sanitize-filename": "^1.6.3",
     "streamspeed": "^2.0.1",
-    "ytdl-core": "^4.5.0"
+    "ytdl-core": "^4.8.3"
   },
   "devDependencies": {
     "mocha": "7.1.1",
