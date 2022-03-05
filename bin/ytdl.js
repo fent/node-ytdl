@@ -288,7 +288,7 @@ if (opts.infoJson) {
         return;
       }
 
-      output = util.tmpl(output, [info, format]);
+      output = util.tmpl(output, [info, format, info.videoDetails]);
       if (!ext && format.container) {
         output += '.' + format.container;
       }
