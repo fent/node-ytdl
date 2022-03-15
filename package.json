@@ -26,7 +26,7 @@
     "test": "nyc --reporter=lcov --reporter=text-summary mocha -- test/*-test.js"
   },
   "dependencies": {
-    "chalk": "^4.0.0",
+    "chalk": "^5.0.1",
     "cli-progress": "^3.8.2",
     "commander": "^6.2.1",
     "homedir": "^0.6.0",
